@@ -1,6 +1,4 @@
 node_modules/
 dist/
-# Compiled by `npm run build`
-assets/css/styles.css
 .DS_Store
 portfolio.zip
