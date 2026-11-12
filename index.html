@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!--
+    SECURITY: Content Security Policy. No inline scripts or styles are allowed.
+    Add any new CDN, font host or image host here or the browser will block it.
+    (frame-ancestors cannot be set from a meta tag; GitHub Pages does not let you set headers.)
+  -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 script-src 'self';
+                 style-src 'self' https://fonts.googleapis.com;
+                 font-src https://fonts.gstatic.com;
+                 img-src 'self' data:;
+                 connect-src 'self';
+                 object-src 'none';
+                 base-uri 'self';
+                 form-action 'none';" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+  <title>Vishesh Jally | Portfolio</title>
+  <meta name="description" content="Vishesh Jally — Computer Science undergraduate at the National University of Singapore. Software engineering, web application security and penetration testing." />
+  <meta name="theme-color" content="#0a0e14" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0e14'/%3E%3Cpath d='M8 11l6 5-6 5' fill='none' stroke='%2339ff88' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M17 22h7' stroke='%2339ff88' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
+
+  <!-- Fonts: JetBrains Mono (headings) + Inter (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <!-- Compiled from src/input.css by `npm run build` (theme tokens and component classes live there) -->
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <script src="assets/js/main.js" defer></script>
+</head>
+
+<body>
+  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded focus:bg-surface focus:px-3 focus:py-2">Skip to content</a>
+
+  <!-- ==================== HEADER / NAV ==================== -->
+  <header id="site-header" class="fixed inset-x-0 top-0 z-50 border-b border-border/60 bg-bg/80 backdrop-blur">
+    <div class="container-page flex h-16 items-center justify-between">
+      <a href="#hero" class="font-mono font-bold text-heading">
+        <span class="text-accent">~/</span>vishesh
+      </a>
+
+      <!-- Desktop nav -->
+      <nav aria-label="Primary" class="hidden gap-8 md:flex">
+        <a class="nav-link" href="#about">About</a>
+        <a class="nav-link" href="#projects">Projects</a>
+        <a class="nav-link" href="#experience">Experience</a>
+        <a class="nav-link" href="#contact">Contact</a>
+      </nav>
+
+      <!-- Mobile toggle -->
+      <button id="menu-toggle" type="button" class="rounded p-2 text-heading md:hidden"
+              aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile nav -->
+    <nav id="mobile-menu" aria-label="Mobile" class="hidden border-t border-border/60 bg-bg md:hidden">
+      <div class="container-page flex flex-col gap-4 py-4">
+        <a class="nav-link" href="#about">About</a>
+        <a class="nav-link" href="#projects">Projects</a>
+        <a class="nav-link" href="#experience">Experience</a>
+        <a class="nav-link" href="#contact">Contact</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- ==================== HERO ==================== -->
+    <section id="hero" class="flex min-h-screen items-center pt-16">
+      <div class="container-page">
+        <p class="eyebrow mb-4">$ whoami</p>
+        <h1 class="text-4xl font-bold tracking-tight sm:text-6xl">
+          Vishesh Jally<span class="animate-pulse text-accent">_</span>
+        </h1>
+        <p class="mt-4 font-mono text-base text-heading/90 sm:text-lg">
+          Computer Science Undergraduate at the National University of Singapore.
+        </p>
+        <p class="mt-6 max-w-2xl text-muted">
+          I build software and then try to break it — my focus is on software engineering,
+          web application vulnerabilities, and penetration testing.
+        </p>
+        <div class="mt-10 flex flex-col gap-4 sm:flex-row">
+          <a class="btn-primary" href="https://github.com/jvally" target="_blank" rel="noopener noreferrer">View GitHub</a>
+          <a class="btn-ghost" href="#contact">Contact Me</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ABOUT ==================== -->
+    <section id="about" class="section">
+      <div class="container-page">
+        <h2 class="section-title"><span aria-hidden="true">cat about.md</span><span class="sr-only">About</span></h2>
+        <div class="grid gap-6 md:grid-cols-3">
+          <div class="card md:col-span-2">
+            <h3 class="card-title">Development environment</h3>
+            <p class="card-body">
+              I work on macOS, splitting my time between VS Code and IntelliJ. Linux workloads
+              and security labs run in Lima VMs, and everything is version-controlled with Git.
+            </p>
+            <ul class="tag-list">
+              <li class="tag">macOS</li>
+              <li class="tag">VS Code</li>
+              <li class="tag">IntelliJ</li>
+              <li class="tag">Lima VMs</li>
+              <li class="tag">Git</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">Away from the keyboard</h3>
+            <p class="card-body">
+              I like building things you can actually hold — physical cardboard crafting
+              and paper modeling.
+            </p>
+            <ul class="tag-list">
+              <li class="tag">cardboard crafting</li>
+              <li class="tag">paper modeling</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PROJECTS ==================== -->
+    <!--
+      To link a card to its repository, add this line before the card's <ul class="tag-list">:
+      <a class="card-link" href="https://github.com/jvally/REPO" target="_blank" rel="noopener noreferrer">repo ↗</a>
+    -->
+    <section id="projects" class="section">
+      <div class="container-page">
+        <h2 class="section-title"><span aria-hidden="true">ls projects/</span><span class="sr-only">Projects</span></h2>
+
+        <!-- 1 column on mobile, 2 columns from sm: up. The first card is featured and spans both. -->
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <article class="card card-hover sm:col-span-2">
+            <p class="eyebrow mb-3">01 · Jul 2026 – Present</p>
+            <h3 class="card-title">Paranoid Planner</h3>
+            <p class="card-body">
+              A web-based study planner for NUS students that imports timetables from NUSMods
+              and rewards finished work with gamified productivity points.
+            </p>
+            <ul class="card-list">
+              <li>Hardened JWT authentication: 15-minute access tokens, rotating server-revocable refresh tokens in httpOnly cookies, reuse detection, login rate limiting, and constant-time credential checks.</li>
+              <li>Built a productivity points system that scores task completion by priority, workload, early completion, and daily streaks, recording each award in a PostgreSQL event log with transactional reversals and unit-tested scoring logic.</li>
+              <li>Developed a NUSMods timetable import that validates a user's share link and fetches module details from the NUSMods API, replacing manual module entry.</li>
+            </ul>
+            <!-- TODO: add repo link (no public repository found on github.com/jvally) -->
+            <ul class="tag-list">
+              <li class="tag">React</li>
+              <li class="tag">Node.js/Express</li>
+              <li class="tag">PostgreSQL</li>
+              <li class="tag">JWT Authentication</li>
+              <li class="tag">NUSMods API</li>
+            </ul>
+          </article>
+
+          <article class="card card-hover">
+            <p class="eyebrow mb-3">02 · Oct 2026 – Present</p>
+            <h3 class="card-title">Login Flow Analysis – OWASP Juice Shop</h3>
+            <ul class="card-list">
+              <li>Black-box tested the login flow of Juice Shop's minified Angular frontend, using Chrome DevTools and Burp Suite to map the requests, tokens, and cookies exchanged with the server.</li>
+              <li>Reproduced the authenticated workflow as a Python <code class="font-mono text-text">requests.Session</code> script and published a write-up with findings, limitations, and reproducible test cases.</li>
+            </ul>
+            <!-- TODO: add link to the write-up (no public repository found on github.com/jvally) -->
+            <ul class="tag-list">
+              <li class="tag">JavaScript</li>
+              <li class="tag">Python</li>
+              <li class="tag">Chrome DevTools</li>
+              <li class="tag">Burp Suite</li>
+            </ul>
+          </article>
+
+          <article class="card card-hover">
+            <p class="eyebrow mb-3">03 · Aug 2026</p>
+            <h3 class="card-title">TripShield – AMEX AI Hackathon 2026</h3>
+            <ul class="card-list">
+              <li>Enforced least-privilege access for six AI agents using request-scoped, read-only MCP tools and server-side validation, with every action auditable.</li>
+              <li>Developed a travel recovery orchestrator that propagates flight cancellations through a dependency graph, with transactional execution and rollback compensation.</li>
+            </ul>
+            <!-- TODO: add repo link (no public repository found on github.com/jvally) -->
+            <ul class="tag-list">
+              <li class="tag">React</li>
+              <li class="tag">Vite</li>
+              <li class="tag">FastAPI</li>
+              <li class="tag">Python</li>
+              <li class="tag">MCP</li>
+              <li class="tag">REST APIs</li>
+            </ul>
+          </article>
+
+          <article class="card card-hover">
+            <p class="eyebrow mb-3">04</p>
+            <h3 class="card-title">Capture The Flag Competitions</h3>
+            <p class="card-body">
+              Competed in the CSA Cyber Conquest CTF 2026 qualifiers and practise on TryHackMe,
+              completing mostly web security challenges — local file inclusion, SQL injection,
+              and cryptanalysis.
+            </p>
+            <a class="card-link" href="https://github.com/jvally/thmWriteUps" target="_blank" rel="noopener noreferrer">TryHackMe write-ups ↗</a>
+            <ul class="tag-list">
+              <li class="tag">Web security</li>
+              <li class="tag">LFI</li>
+              <li class="tag">SQL injection</li>
+              <li class="tag">Cryptanalysis</li>
+            </ul>
+          </article>
+
+          <article class="card card-hover">
+            <p class="eyebrow mb-3">05</p>
+            <h3 class="card-title">Custom HTTP Web Server</h3>
+            <p class="card-body">
+              An HTTP server written in Python directly on top of raw TCP sockets.
+            </p>
+            <!-- TODO: add repo link (no public repository found on github.com/jvally) -->
+            <ul class="tag-list">
+              <li class="tag">Python</li>
+              <li class="tag">TCP sockets</li>
+              <li class="tag">HTTP</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== EXPERIENCE ==================== -->
+    <section id="experience" class="section">
+      <div class="container-page">
+        <h2 class="section-title"><span aria-hidden="true">cat experience.log</span><span class="sr-only">Experience and education</span></h2>
+        <ol class="timeline">
+          <li class="timeline-item">
+            <p class="eyebrow">Education · Expected May 2029</p>
+            <h3 class="card-title mt-1">Bachelor of Computing in Computer Science</h3>
+            <p class="font-mono text-sm text-text">National University of Singapore</p>
+            <p class="card-body mt-3">Relevant coursework:</p>
+            <ul class="mt-2 flex flex-wrap gap-2">
+              <li class="tag">CS2040S Data Structures &amp; Algorithms</li>
+              <li class="tag">CS2100 Computer Organisation</li>
+              <li class="tag">CS2105 Introduction to Computer Networks</li>
+            </ul>
+          </li>
+
+          <li class="timeline-item">
+            <p class="eyebrow">Work · Jan 2023 – Nov 2024</p>
+            <h3 class="card-title mt-1">Intelligence Sergeant</h3>
+            <p class="font-mono text-sm text-text">Singapore Armed Forces · Singapore</p>
+            <ul class="card-list max-w-3xl">
+              <li>Analysed information and produced time-sensitive intelligence reports under strict deadlines; documented findings clearly for decision-makers.</li>
+              <li>Coordinated concurrent taskings with structured documentation workflows, delivering accurate reports to stakeholders.</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ==================== CONTACT ==================== -->
+    <section id="contact" class="section">
+      <div class="container-page">
+        <h2 class="section-title"><span aria-hidden="true">./contact.sh</span><span class="sr-only">Contact</span></h2>
+        <p class="max-w-2xl text-muted">
+          Open to internships, collaborations and CTF teams. The fastest way to reach me is by email at
+          <a class="link" href="mailto:jvallyb@gmail.com">jvallyb@gmail.com</a>.
+        </p>
+        <div class="mt-8 flex flex-col gap-4 sm:flex-row">
+          <a class="btn-primary" href="mailto:jvallyb@gmail.com">Send an email</a>
+          <a class="btn-ghost" href="https://www.linkedin.com/in/vishesh-jally-452118341/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          <a class="btn-ghost" href="https://github.com/jvally" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="border-t border-border/60 py-8">
+    <div class="container-page flex flex-col items-center justify-between gap-4 sm:flex-row">
+      <p class="font-mono text-xs text-muted">&copy; <span id="year">2026</span> Vishesh Jally. All rights reserved.</p>
+      <div class="flex gap-6">
+        <a class="nav-link" href="https://github.com/jvally" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a class="nav-link" href="https://www.linkedin.com/in/vishesh-jally-452118341/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "vishesh-jally-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Personal portfolio site (static, Tailwind CSS)",
+  "scripts": {
+    "dev": "tailwindcss -i src/input.css -o assets/css/styles.css --watch",
+    "build:css": "tailwindcss -i src/input.css -o assets/css/styles.css --minify",
+    "build": "npm run build:css && rm -rf dist && mkdir -p dist && cp -R index.html assets dist/ && touch dist/.nojekyll",
+    "preview": "npm run build && python3 -m http.server 8080 --directory dist"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.19"
+  }
+}

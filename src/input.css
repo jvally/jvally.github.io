@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============ 1. THEME TOKENS — edit colours here ============ */
+:root {
+  --color-bg:        10 14 20;     /* page background        */
+  --color-surface:   17 23 32;     /* cards, header          */
+  --color-border:    35 45 60;     /* hairlines              */
+  --color-text:      201 209 217;  /* body text              */
+  --color-muted:     125 138 153;  /* secondary text         */
+  --color-heading:   240 246 252;  /* headings               */
+  --color-accent:    57 255 136;   /* terminal green         */
+  --header-height:   4rem;
+}
+
+/* ============ 2. BASE ============ */
+@layer base {
+  body    { @apply bg-bg text-text font-sans antialiased leading-relaxed; }
+  h1, h2, h3 { @apply font-mono text-heading; }
+  section[id] { scroll-margin-top: var(--header-height); }
+  ::selection { @apply bg-accent/30 text-heading; }
+  :focus-visible { @apply outline outline-2 outline-offset-2 outline-accent; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; animation: none !important; }
+  }
+}
+
+/* ============ 3. COMPONENT CLASSES — edit shared styling here ============ */
+@layer components {
+  /* Layout */
+  .container-page { @apply mx-auto w-full max-w-5xl px-4 sm:px-6; }
+  .section        { @apply py-20 sm:py-24 border-t border-border/60; }
+  .section-title  { @apply mb-10 text-2xl sm:text-3xl font-bold; }
+  /* Shell-prompt heading: visible text is a command, real name is in an sr-only span */
+  .section-title::before { content: '$ '; @apply text-accent; }
+
+  /* Navigation */
+  .nav-link        { @apply font-mono text-sm text-muted transition-colors hover:text-accent; }
+  .nav-link.active { @apply text-accent; }
+
+  /* Buttons */
+  .btn         { @apply inline-flex items-center justify-center gap-2 rounded-md px-5 py-2.5 font-mono text-sm font-medium transition-all duration-200; }
+  .btn-primary { @apply btn bg-accent text-bg hover:shadow-glow hover:-translate-y-0.5; }
+  .btn-ghost   { @apply btn border border-border text-heading hover:border-accent hover:text-accent hover:-translate-y-0.5; }
+
+  /* Cards */
+  .card       { @apply flex flex-col rounded-lg border border-border bg-surface p-6 transition-all duration-300; }
+  .card-hover { @apply hover:-translate-y-1 hover:border-accent/60 hover:shadow-glow; }
+  .card-title { @apply mb-2 text-lg font-bold; }
+  .card-body  { @apply text-sm text-muted; }
+  .card-list  { @apply mt-3 list-none space-y-2 text-sm text-muted; }
+  .card-list > li { @apply relative pl-5; }
+  .card-list > li::before { content: '>'; @apply absolute left-0 font-mono text-accent; }
+  .card-link  { @apply mt-4 inline-flex items-center gap-1 self-start font-mono text-xs text-accent underline-offset-4 hover:underline; }
+
+  /* Tags */
+  .tag-list { @apply mt-auto flex flex-wrap gap-2 pt-5; }
+  .tag      { @apply rounded border border-border px-2 py-0.5 font-mono text-xs text-accent/90; }
+
+  /* Timeline (experience) */
+  .timeline       { @apply space-y-10 border-l border-border pl-6; }
+  .timeline-item  { @apply relative; }
+  .timeline-item::before { content: ''; @apply absolute -left-[1.85rem] top-1.5 h-2.5 w-2.5 rounded-full bg-accent; }
+
+  /* Misc */
+  .eyebrow { @apply font-mono text-sm text-accent; }
+  .link    { @apply text-accent underline-offset-4 hover:underline; }
+}
