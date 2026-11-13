@@ -9,7 +9,8 @@ Static personal site: HTML, Tailwind CSS 3 (compiled with the Tailwind CLI) and 
 | `index.html` | Page markup and content |
 | `src/input.css` | Theme tokens and component classes (Tailwind source) |
 | `tailwind.config.js` | Maps tokens to Tailwind utilities |
-| `assets/js/main.js` | Mobile menu, smooth scroll, active nav link |
+| `assets/js/main.js` | Mobile menu, smooth scroll, active nav link, unlock game |
+| `assets/js/boot.js` | Turns the unlock game on before first paint |
 | `assets/css/styles.css` | Build output. Committed so the site also renders when Pages serves the branch directly; run `npm run build` before committing style changes |
 | `dist/` | Deployable site, not committed |
 | `.nojekyll` | Tells Pages to serve files as they are, without Jekyll |

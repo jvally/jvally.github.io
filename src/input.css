@@ -68,3 +68,56 @@
   .eyebrow { @apply font-mono text-sm text-accent; }
   .link    { @apply text-accent underline-offset-4 hover:underline; }
 }
+
+/* ============ 4. GAME (terminal unlock) ============
+   Everything here applies only once assets/js/boot.js has added `game` to <html>.
+   `game-done` is added when every step is unlocked or the visitor skips. */
+
+/* Hidden by default (no JavaScript, or game finished) */
+.terminal-dock, .game-only, .flag-drop, .lock-panel { display: none; }
+html.game .terminal-dock { display: block; }
+html.game:not(.game-done) .game-only { display: block; }
+html.game:not(.game-done) .flag-drop:not(.is-used) { display: flex; }
+html.game body { padding-bottom: 9rem; }
+html.game.game-done body { padding-bottom: 3.5rem; }
+
+/* A locked element hides its content and shows its lock panel */
+html.game:not(.game-done) [data-unlock]:not(.is-unlocked) > :not(.lock-panel) { display: none; }
+html.game:not(.game-done) [data-unlock]:not(.is-unlocked) > .lock-panel { display: block; }
+html.game:not(.game-done) .card[data-unlock]:not(.is-unlocked) {
+  @apply translate-y-0 border-dashed border-border bg-transparent shadow-none;
+  min-height: 9rem;
+}
+
+/* Lock panel */
+.lock-panel { @apply font-mono text-sm text-muted; }
+.lock-panel--section .lock-box { @apply rounded-lg border border-dashed border-border p-6; }
+.lock-tag   { @apply text-xs tracking-widest text-accent; }
+.lock-title { @apply mt-2 text-heading; }
+.lock-hint  { @apply mt-1 leading-7; }
+
+/* Clickable command / flag */
+.cmd-chip { @apply inline-flex items-center rounded border border-accent/50 bg-accent/10 px-2 py-0.5 font-mono text-xs text-accent transition-colors hover:bg-accent/20; }
+.flag-drop { @apply mt-4 flex-wrap items-center gap-2 border-t border-dashed border-border pt-4 font-mono text-xs text-muted; }
+
+/* Reveal animation */
+.just-unlocked { animation: unlock-in 600ms ease-out; }
+@keyframes unlock-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Terminal dock */
+.terminal-dock   { @apply fixed inset-x-0 bottom-0 z-50 border-t border-border bg-bg/95 font-mono text-xs backdrop-blur; }
+.term-output     { @apply min-w-0 flex-1 text-muted; }
+.term-echo       { @apply block truncate text-muted; }
+.term-reply      { @apply block text-text; }
+.term-progress   { @apply shrink-0 py-1 text-accent; }
+.term-btn        { @apply shrink-0 rounded border border-border px-2 py-1 text-muted transition-colors hover:border-accent hover:text-accent; }
+.term-btn--primary { @apply border-accent/50 bg-accent/10 text-accent hover:bg-accent/20; }
+.term-input-row  { @apply mt-2 flex items-center gap-2; }
+.term-prompt     { @apply shrink-0 text-accent; }
+.term-input      { @apply min-w-0 flex-1 rounded border border-border bg-surface px-2 py-1.5 text-base sm:text-sm text-heading placeholder:text-muted/70 focus:border-accent focus:outline-none; }
+html.game-done .term-input-row,
+html.game-done [data-game="skip"] { display: none; }
+html:not(.game-done) [data-game="replay"] { display: none; }
