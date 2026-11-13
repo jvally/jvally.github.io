@@ -33,6 +33,8 @@
 
   <!-- Compiled from src/input.css by `npm run build` (theme tokens and component classes live there) -->
   <link rel="stylesheet" href="assets/css/styles.css" />
+  <!-- boot.js is deliberately not deferred: it switches the unlock game on before first paint -->
+  <script src="assets/js/boot.js"></script>
   <script src="assets/js/main.js" defer></script>
 </head>
 
@@ -93,11 +95,17 @@
           <a class="btn-primary" href="https://github.com/jvally" target="_blank" rel="noopener noreferrer">View GitHub</a>
           <a class="btn-ghost" href="#contact">Contact Me</a>
         </div>
+        <!-- Shown only while the unlock game is running -->
+        <p class="game-only mt-8 max-w-2xl font-mono text-xs text-muted">
+          <span class="text-accent">//</span> This site is a mini CTF: the sections below are locked.
+          Run commands in the terminal at the bottom of the page to unlock them, or
+          <button type="button" class="link" data-run="sudo unlock --all">skip the game</button>.
+        </p>
       </div>
     </section>
 
     <!-- ==================== ABOUT ==================== -->
-    <section id="about" class="section">
+    <section id="about" class="section" data-unlock="cat about.md">
       <div class="container-page">
         <h2 class="section-title"><span aria-hidden="true">cat about.md</span><span class="sr-only">About</span></h2>
         <div class="grid gap-6 md:grid-cols-3">
@@ -133,10 +141,14 @@
 
     <!-- ==================== PROJECTS ==================== -->
     <!--
+      UNLOCK GAME: data-unlock is the command or flag a visitor must enter to reveal that element.
+      Steps unlock in page order. A card's flag is shown automatically at the bottom of the card before it.
+      Remove a data-unlock attribute to make that element always visible.
+
       To link a card to its repository, add this line before the card's <ul class="tag-list">:
       <a class="card-link" href="https://github.com/jvally/REPO" target="_blank" rel="noopener noreferrer">repo ↗</a>
     -->
-    <section id="projects" class="section">
+    <section id="projects" class="section" data-unlock="ls projects/">
       <div class="container-page">
         <h2 class="section-title"><span aria-hidden="true">ls projects/</span><span class="sr-only">Projects</span></h2>
 
@@ -164,7 +176,7 @@
             </ul>
           </article>
 
-          <article class="card card-hover">
+          <article class="card card-hover" data-unlock="flag{bl4ck_b0x_l0gin}">
             <p class="eyebrow mb-3">02 · Oct 2026 – Present</p>
             <h3 class="card-title">Login Flow Analysis – OWASP Juice Shop</h3>
             <ul class="card-list">
@@ -180,7 +192,7 @@
             </ul>
           </article>
 
-          <article class="card card-hover">
+          <article class="card card-hover" data-unlock="flag{l34st_pr1v1lege}">
             <p class="eyebrow mb-3">03 · Aug 2026</p>
             <h3 class="card-title">TripShield – AMEX AI Hackathon 2026</h3>
             <ul class="card-list">
@@ -198,7 +210,7 @@
             </ul>
           </article>
 
-          <article class="card card-hover">
+          <article class="card card-hover" data-unlock="flag{un10n_s3lect}">
             <p class="eyebrow mb-3">04</p>
             <h3 class="card-title">Capture The Flag Competitions</h3>
             <p class="card-body">
@@ -215,7 +227,7 @@
             </ul>
           </article>
 
-          <article class="card card-hover">
+          <article class="card card-hover" data-unlock="flag{200_0K}">
             <p class="eyebrow mb-3">05</p>
             <h3 class="card-title">Custom HTTP Web Server</h3>
             <p class="card-body">
@@ -233,7 +245,7 @@
     </section>
 
     <!-- ==================== EXPERIENCE ==================== -->
-    <section id="experience" class="section">
+    <section id="experience" class="section" data-unlock="cat experience.log">
       <div class="container-page">
         <h2 class="section-title"><span aria-hidden="true">cat experience.log</span><span class="sr-only">Experience and education</span></h2>
         <ol class="timeline">
@@ -263,7 +275,7 @@
     </section>
 
     <!-- ==================== CONTACT ==================== -->
-    <section id="contact" class="section">
+    <section id="contact" class="section" data-unlock="./contact.sh">
       <div class="container-page">
         <h2 class="section-title"><span aria-hidden="true">./contact.sh</span><span class="sr-only">Contact</span></h2>
         <p class="max-w-2xl text-muted">
@@ -289,5 +301,24 @@
       </div>
     </div>
   </footer>
+
+  <!-- ==================== TERMINAL (unlock game) ==================== -->
+  <!-- Hidden unless JavaScript is running; see "Game" in src/input.css and assets/js/main.js -->
+  <aside class="terminal-dock" aria-label="Terminal mini-game">
+    <div class="container-page py-2">
+      <div class="flex items-start gap-3">
+        <p id="term-output" class="term-output" role="log" aria-live="polite"></p>
+        <span id="term-progress" class="term-progress" aria-label="Unlock progress"></span>
+        <button type="button" class="term-btn" data-game="skip" data-run="sudo unlock --all">skip</button>
+        <button type="button" class="term-btn" data-game="replay" data-run="reset">replay</button>
+      </div>
+      <div class="term-input-row">
+        <label for="term-input" class="term-prompt"><span class="hidden sm:inline">visitor@vishesh:~</span>$<span class="sr-only"> Terminal command</span></label>
+        <input id="term-input" class="term-input" type="text" maxlength="80" placeholder="type a command, or help"
+               autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" />
+        <button type="button" id="term-run" class="term-btn term-btn--primary">run</button>
+      </div>
+    </div>
+  </aside>
 </body>
 </html>
