@@ -7,7 +7,7 @@ Design reference for `index.html`. Read this before changing styles; update it w
 A modern terminal, not a retro one. Dark canvas, one green accent, monospace headings over a clean sans body. The security/developer flavour comes from shell-prompt details (`$ whoami`, `$ ls projects/`), not from decoration.
 
 - Stack: HTML5, Tailwind CSS 3 (compiled with the Tailwind CLI), vanilla JavaScript.
-- Files: `index.html` (markup), `src/input.css` (tokens and component classes), `tailwind.config.js` (token-to-utility mapping), `assets/js/main.js` (behaviour). `assets/css/styles.css` is build output; never edit it.
+- Files: `index.html` (markup), `src/input.css` (tokens and component classes), `tailwind.config.js` (token-to-utility mapping), `assets/js/main.js` (behaviour and the unlock game), `assets/js/boot.js` (switches the game on before first paint). `assets/css/styles.css` is build output; never edit it.
 - Dark only. No light theme yet.
 
 ## Colour tokens
@@ -85,6 +85,34 @@ Adding a project: copy an `<article class="card card-hover">` block in the proje
 
 Adding an experience entry: copy a `<li class="timeline-item">` block. The eyebrow reads `Kind · dates`.
 
+## Unlock game
+
+The page is a small CTF. Sections and project cards start locked; a terminal bar fixed to the bottom of the page takes commands that reveal them one at a time.
+
+- A step is any element with a `data-unlock` attribute. Its value is the exact command or flag that reveals it. Steps unlock in page order.
+- Sections use the command already shown in their heading (`cat about.md`, `ls projects/`, ...). The lock panel shows the command as a clickable chip, so one tap is enough on a phone.
+- Project cards use flags (`flag{...}`). The flag for a card is shown at the bottom of the card before it, so a visitor reads a project, collects its flag and submits it to decrypt the next one.
+- Terminal commands: `help`, `hint`, `ls`, `whoami`, `clear`, `reset`, `sudo unlock --all` (or `skip`).
+- Progress is kept in `localStorage` (`vj:unlocked`, `vj:done`). Finishing or skipping collapses the bar to one line with a `replay` button.
+
+Rules:
+
+- Nothing may be permanently hidden. A `skip` button is always visible in the terminal bar and in the hero, and with JavaScript off the game never starts and the whole page is visible.
+- The game is decoration, not access control: commands and flags are readable in the page source.
+- Visitor input is compared as a string and echoed with `textContent` only.
+- To add a locked project, add `data-unlock="flag{...}"` to its `<article>`; the flag chip appears in the previous card automatically. To exempt an element, remove its `data-unlock`.
+
+| Class | Purpose |
+| --- | --- |
+| `.terminal-dock`, `.term-*` | The fixed terminal bar, its output line, input and buttons |
+| `.lock-panel`, `.lock-box`, `.lock-tag`, `.lock-title`, `.lock-hint` | Placeholder shown in place of a locked element |
+| `.cmd-chip` | Clickable command or flag; runs its `data-run` value |
+| `.flag-drop` | "flag found" line appended to a card |
+| `.game-only` | Shown only while the game is running |
+| `.just-unlocked` | One-off reveal animation |
+
+Files: `assets/js/boot.js` adds the `game` class to `<html>` before first paint; the logic is `initGame()` in `assets/js/main.js`; styles are section 4 of `src/input.css`.
+
 ## Motion
 
 - Hover transitions: 200ms on buttons, 300ms on cards.
@@ -122,6 +150,7 @@ Adding an experience entry: copy a `<li class="timeline-item">` block. The eyebr
 - Add CRT effects: scanlines, heavy text glow, all-caps headings.
 - Put the hover glow on anything except project cards and the primary button.
 - Hide information behind hover states.
+- Lock content without a skip path, or add a step whose answer is not shown on the page.
 
 ## Open items
 
