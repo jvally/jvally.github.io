@@ -90,18 +90,11 @@
     const steps = Array.from(document.querySelectorAll('[data-unlock]')).map((node) => {
       const answer = node.dataset.unlock.trim();
       const isFlag = /^flag\{/i.test(answer);
-      const isSection = node.tagName === 'SECTION';
+      // A section body carries data-unlock; its <section> keeps the command visible while locked
+      const section = isFlag ? null : node.closest('section');
 
       // Lock panel shown in place of the element's content while it is locked
-      const panel = el('div', 'lock-panel' + (isSection ? ' lock-panel--section container-page' : ''));
-      const box = el('div', 'lock-box');
-      const hint = el('p', 'lock-hint');
-      box.append(
-        el('p', 'lock-tag', '[ LOCKED ]'),
-        el('p', 'lock-title', isFlag ? 'project encrypted' : 'permission denied'),
-        hint
-      );
-      panel.append(box);
+      const panel = el('div', 'lock-panel');
       node.append(panel);
 
       // A flag is "found" at the bottom of the element just before the one it unlocks
@@ -112,7 +105,7 @@
         drop.append(el('span', '', 'flag found:'), chip(answer));
         carrier.append(drop);
       }
-      return { node, answer, key: norm(answer), isFlag, hint, drop };
+      return { node, answer, key: norm(answer), isFlag, section, panel, drop };
     });
     if (!steps.length) return;
 
@@ -123,7 +116,7 @@
       const next = steps[unlocked];
       if (!next) return ['everything is unlocked.'];
       return next.isFlag
-        ? ['next: submit the flag shown at the bottom of the last project.']
+        ? ['next: submit the flag at the bottom of the last project.']
         : ['next: run ', chip(next.answer)];
     };
 
@@ -140,13 +133,26 @@
       steps.forEach((step, i) => {
         step.node.classList.toggle('is-unlocked', i < unlocked);
         if (step.drop) step.drop.classList.toggle('is-used', i < unlocked);
+        if (step.section) {
+          step.section.classList.toggle('is-locked', i >= unlocked);
+          step.section.classList.toggle('is-next', i === unlocked);
+        }
         if (i < unlocked) return;
-        if (i > unlocked) {
-          step.hint.replaceChildren('unlock the previous step first.');
-        } else if (step.isFlag) {
-          step.hint.replaceChildren('submit the flag from the previous project to decrypt it.');
+        const isNext = i === unlocked;
+        if (step.isFlag) {
+          // Locked project card
+          step.panel.replaceChildren(el('p', 'lock-title', 'encrypted'));
+          if (isNext) step.panel.append(el('p', 'lock-hint', 'Submit the flag from the project above.'));
+        } else if (isNext) {
+          // The next command in the queue gets a run button
+          const btn = el('button', 'run-btn', 'run');
+          btn.type = 'button';
+          btn.dataset.run = step.answer;
+          btn.append(el('span', '', '\u21B5'));
+          btn.lastChild.setAttribute('aria-hidden', 'true');
+          step.panel.replaceChildren(btn, el('span', 'run-note', 'or type it in the terminal below'));
         } else {
-          step.hint.replaceChildren('run ', chip(step.answer), ' to unlock this section.');
+          step.panel.replaceChildren();
         }
       });
       root.classList.toggle('game-done', done);
@@ -158,7 +164,7 @@
     function reveal(step) {
       step.node.classList.add('just-unlocked');
       step.node.addEventListener('animationend', () => step.node.classList.remove('just-unlocked'), { once: true });
-      step.node.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: step.isFlag ? 'center' : 'start' });
+      (step.section || step.node).scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: step.isFlag ? 'center' : 'start' });
     }
 
     function run(raw) {
@@ -169,7 +175,7 @@
 
       if (index !== -1 && index < unlocked) {
         print(typed, ['already unlocked. ', ...nextHint()]);
-        steps[index].node.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'center' });
+        (steps[index].section || steps[index].node).scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: steps[index].isFlag ? 'center' : 'start' });
       } else if (index === unlocked) {
         unlocked += 1;
         render();
@@ -217,7 +223,7 @@
       ? ['root@vishesh:~# everything is unlocked.']
       : unlocked > 0
         ? ['welcome back. ' + unlocked + '/' + steps.length + ' unlocked. ', ...nextHint()]
-        : ['mini CTF: unlock each section. ', ...nextHint()]);
+        : ['run each command to print its section. ', ...nextHint()]);
   }
 
   initMobileMenu();
