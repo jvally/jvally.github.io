@@ -16,11 +16,12 @@ module.exports = {
         accent: token('--color-accent'),
       },
       fontFamily: {
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        sans: ['"IBM Plex Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
-        glow: '0 0 0 1px rgb(var(--color-accent) / 0.5), 0 8px 30px -8px rgb(var(--color-accent) / 0.35)',
+        // Card hover: a faint accent edge plus a soft drop, no neon glow
+        lift: '0 0 0 1px rgb(var(--color-accent) / 0.14), 0 16px 32px -20px rgb(0 0 0 / 0.9)',
       },
     },
   },
