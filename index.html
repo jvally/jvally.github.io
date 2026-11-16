@@ -123,7 +123,9 @@
       </div>
     </section>
 
-    <!-- To link a card to its repo, add before its .card-stack:
+    <!-- Clicking a card opens the preview window, which plays the card's .demo steps (<b>action</b> result).
+         Add data-shot="assets/img/NAME.webp" to an <article> to show a screenshot above the steps.
+         To link a card to its repo, add before its .card-stack:
          <a class="card-link" href="https://github.com/jvally/REPO" target="_blank" rel="noopener noreferrer">repo ↗</a> -->
     <section id="projects" class="panel section reveal">
       <h2 class="cmd"><span aria-hidden="true">ls projects/</span><span class="sr-only">Projects</span></h2>
@@ -141,6 +143,13 @@
               <li>Developed a NUSMods timetable import that validates a user's share link and fetches module details from the NUSMods API, replacing manual module entry.</li>
             </ul>
             <p class="card-stack">React · Node.js/Express · PostgreSQL · JWT Authentication · NUSMods API</p>
+            <button type="button" class="card-preview" data-preview>Preview</button>
+            <ol class="demo">
+              <li><b>Log in</b> A 15-minute access token is issued and a rotating refresh token is set in an httpOnly cookie.</li>
+              <li><b>Import a timetable</b> The NUSMods share link is validated and module details are fetched from the NUSMods API.</li>
+              <li><b>Finish a task</b> Points are scored on priority, workload, early completion and the daily streak.</li>
+              <li><b>Record it</b> The award is written to the PostgreSQL event log and can be reversed in a transaction.</li>
+            </ol>
           </article>
 
           <article class="card card-hover" data-unlock="flag{bl4ck_b0x_l0gin}">
@@ -153,6 +162,13 @@
               <li>Reproduced the authenticated workflow as a Python <code class="font-mono text-text">requests.Session</code> script and published a write-up with findings, limitations, and reproducible test cases.</li>
             </ul>
             <p class="card-stack">JavaScript · Python · Chrome DevTools · Burp Suite</p>
+            <button type="button" class="card-preview" data-preview>Preview</button>
+            <ol class="demo">
+              <li><b>Observe</b> Open the Juice Shop login page with Chrome DevTools and Burp Suite attached.</li>
+              <li><b>Map</b> Trace the requests, tokens and cookies the Angular frontend exchanges with the server.</li>
+              <li><b>Reproduce</b> Replay the authenticated workflow from a Python requests.Session script.</li>
+              <li><b>Report</b> Publish the findings, limitations and reproducible test cases.</li>
+            </ol>
           </article>
 
           <article class="card card-hover" data-unlock="flag{l34st_pr1v1lege}">
@@ -166,6 +182,13 @@
               <li>Developed a travel recovery orchestrator that propagates flight cancellations through a dependency graph, with transactional execution and rollback compensation.</li>
             </ul>
             <p class="card-stack">React · Vite · FastAPI · Python · MCP · REST APIs</p>
+            <button type="button" class="card-preview" data-preview>Preview</button>
+            <ol class="demo">
+              <li><b>A flight is cancelled</b> The orchestrator propagates the cancellation through the trip's dependency graph.</li>
+              <li><b>Agents respond</b> Six AI agents work through request-scoped, read-only MCP tools.</li>
+              <li><b>The server checks</b> Every action is validated server-side and recorded for audit.</li>
+              <li><b>Changes apply</b> Execution is transactional, with rollback compensation if a step fails.</li>
+            </ol>
           </article>
 
           <article class="card card-hover" data-unlock="flag{un10n_s3lect}">
@@ -173,12 +196,24 @@
             <p class="card-body">Competed in the CSA Cyber Conquest CTF 2026 qualifiers and practise on TryHackMe, mostly on web security challenges: local file inclusion, SQL injection and cryptanalysis.</p>
             <a class="card-link" href="https://github.com/jvally/thmWriteUps" target="_blank" rel="noopener noreferrer">TryHackMe write-ups ↗</a>
             <p class="card-stack">Web security · LFI · SQL injection · Cryptanalysis</p>
+            <button type="button" class="card-preview" data-preview>Preview</button>
+            <ol class="demo">
+              <li><b>Pick a challenge</b> Mostly web security, on TryHackMe and in the CSA Cyber Conquest CTF 2026 qualifiers.</li>
+              <li><b>Find the weakness</b> Local file inclusion, SQL injection or a cryptanalysis problem.</li>
+              <li><b>Capture the flag</b> Then write it up.</li>
+            </ol>
           </article>
 
           <article class="card card-hover" data-unlock="flag{200_0K}">
             <h3 class="card-title">Custom HTTP Web Server</h3>
             <p class="card-body">An HTTP server written in Python directly on top of raw TCP sockets.</p>
             <p class="card-stack">Python · TCP sockets · HTTP</p>
+            <button type="button" class="card-preview" data-preview>Preview</button>
+            <ol class="demo">
+              <li><b>Listen</b> The server opens a raw TCP socket and waits for connections.</li>
+              <li><b>Receive</b> A client connects and sends an HTTP request.</li>
+              <li><b>Respond</b> The server writes the HTTP response back over the same socket.</li>
+            </ol>
           </article>
         </div>
       </div>
@@ -244,17 +279,34 @@
     <div class="terminal-inner">
       <div class="flex items-start gap-3">
         <p id="term-output" class="term-output" role="log" aria-live="polite"></p>
-        <span id="term-progress" class="shrink-0 py-1 text-muted" aria-label="Unlock progress"></span>
-        <button type="button" class="term-btn" data-run="skip">skip</button>
         <button type="button" class="term-btn" data-run="reset">replay</button>
       </div>
       <div class="term-row mt-2 flex items-center gap-2">
         <label for="term-input" class="shrink-0 text-accent"><span class="hidden sm:inline">visitor@vishesh:~</span>$<span class="sr-only"> Terminal command</span></label>
-        <input id="term-input" class="term-input" type="text" maxlength="80" placeholder="type a command, or help"
-               autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" />
+        <!-- #term-ghost sits behind the input and shows the completion that Tab accepts -->
+        <div class="term-field">
+          <span id="term-ghost" class="term-ghost" aria-hidden="true"></span>
+          <input id="term-input" class="term-input" type="text" maxlength="80" placeholder="type a command, Tab completes"
+                 autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" />
+        </div>
         <button type="button" id="term-run" class="term-btn">run</button>
       </div>
     </div>
   </aside>
+
+  <!-- Project preview window; main.js fills it from the clicked card -->
+  <dialog id="preview" class="preview" aria-labelledby="preview-title">
+    <div class="preview-bar">
+      <span class="preview-dots" aria-hidden="true"></span>
+      <h2 id="preview-title" class="preview-title"></h2>
+      <button type="button" class="preview-close" data-close aria-label="Close preview">&times;</button>
+    </div>
+    <img id="preview-shot" class="preview-shot" alt="" hidden />
+    <ol id="preview-steps" class="preview-steps"></ol>
+    <p class="preview-foot">
+      Walkthrough, not a screenshot.
+      <button type="button" id="preview-replay" class="link">Replay</button>
+    </p>
+  </dialog>
 </body>
 </html>

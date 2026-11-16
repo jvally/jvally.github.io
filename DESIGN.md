@@ -69,6 +69,8 @@ All of it stops under `prefers-reduced-motion: reduce`.
 | Sections | `.reveal` fades up once when it enters the viewport |
 | Unlock | New content rises in (`.just-unlocked`) and the page scrolls to it |
 | Cards | Hover lifts 4px with a light border and soft shadow |
+| Links | `.link`, nav links and the preview button grow to 110% on hover and focus |
+| Preview window | Pops in; its steps appear one at a time |
 
 To add a cloud, add an `<img class="cloud cloud--N">` and one `.cloud--N` line setting position (`--x`, `--y`), width (`--w`), depth (`--d`) and drift time (`--t`).
 
@@ -78,13 +80,27 @@ To add a cloud, add an `<img class="cloud cloud--N">` and one `.cloud--N` line s
 - Sections: `data-unlock` goes on `.body`. A locked section collapses to its command; the next one gets a cursor and a `run` button.
 - Project cards: `data-unlock="flag{...}"` on the `<article>`. A card's flag is shown at the bottom of the card before it.
 - Terminal commands: `help`, `hint`, `whoami`, `reset`, `skip` (also `sudo unlock --all`).
+- Completion: `#term-ghost` sits behind the input and shows the first matching command in muted text; Tab or Right Arrow accepts it. The next step is offered first. Flags are offered only once the card showing them is unlocked. Tab with nothing to complete moves focus as usual.
+- The terminal bar has no progress counter or skip button: the dial shows progress, `hint` prints it, and `skip` is a command.
 - Progress is kept in `localStorage` (`vj:unlocked`, `vj:done`).
 
 Rules:
 
-- Nothing is permanently hidden: `skip` is always in the terminal bar, "show everything" is in the hero, and without JavaScript the page is fully visible.
+- Nothing is permanently hidden: "show everything" is in the hero, `skip` works in the terminal, and without JavaScript the page is fully visible.
 - The game is decoration, not access control: answers are in the page source.
 - Visitor input is compared as a string and echoed with `textContent` only.
+
+## Project preview
+
+- Clicking an unlocked project card, or its `Preview` button, opens `#preview`, a native `<dialog>` styled as a small window. Escape, the close button or a click on the backdrop closes it.
+- The window plays the card's `.demo` list, one step every 650ms. Each step is `<li><b>action</b> result</li>`. `Replay` restarts it.
+- Steps describe how the project works using only what the resume states. The footer says it is a walkthrough, not a screenshot.
+- To show a real screenshot or recording frame, add `data-shot="assets/img/NAME.webp"` to the `<article>`; it appears above the steps.
+- A card without a `.demo` list does not open a preview.
+
+## Page edges
+
+`html` has a solid sky colour and `overscroll-behavior-y: none`, so pulling past the top or bottom neither bounces nor exposes a white strip. Side effect: pull-to-refresh is disabled on mobile browsers.
 
 ## Security rules
 
@@ -109,5 +125,6 @@ Rules:
 
 ## Open items
 
+- Project previews are text walkthroughs; no real screenshots yet.
 - Only the CTF card links to a repository.
 - Fonts load from Google Fonts; self-hosting would remove the last third-party origins from the CSP.
