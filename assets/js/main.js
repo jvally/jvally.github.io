@@ -132,7 +132,6 @@
       else step.panel.replaceChildren(...(isNext ? [chip(step.answer, 'run-btn', 'run ↵'), make('span', 'run-note', 'or type it in the terminal below')] : []));
     });
     root.classList.toggle('done', done());
-    $('#term-progress').textContent = unlocked + '/' + total;
     // The dial has one segment per step
     const arc = 80 / total;
     $('#dial-progress').setAttribute('stroke-dasharray', `${(arc - 1 + ' 1 ').repeat(unlocked)}0 80`);
@@ -141,7 +140,7 @@
   }
 
   const commands = new Map([
-    ['help', () => ['commands: help, hint, whoami, reset, skip']],
+    ['help', () => ['commands: help, hint, whoami, reset, skip. Tab completes what you type.']],
     ['hint', () => [unlocked + '/' + total + ' unlocked. ', ...next()]],
     ['whoami', () => [done() ? 'root' : 'visitor (unlock everything to become root)']],
     ['reset', () => { unlocked = 0; render(); scrollTo(document.body); return ['locked everything again. ', ...next()]; }],
@@ -173,14 +172,71 @@
     }
   }
 
-  const submit = () => { run(input.value); input.value = ''; };
-  input.addEventListener('keydown', (e) => e.key === 'Enter' && submit());
+  // Completion: the ghost behind the input shows the first match; Tab or Right Arrow accepts it.
+  // Flags are only offered once the card showing them is unlocked.
+  const ghost = $('#term-ghost');
+  const suggestion = () => {
+    const typed = input.value.toLowerCase();
+    const options = [steps[unlocked], ...steps.filter((step, i) => !step.isFlag || i <= unlocked)]
+      .filter(Boolean).map((step) => step.answer).concat([...commands.keys()]);
+    return typed && options.find((option) => option.toLowerCase().startsWith(typed) && option.length > typed.length);
+  };
+  const suggest = () => {
+    const match = suggestion();
+    ghost.replaceChildren(...(match ? [make('span', '', input.value), match.slice(input.value.length)] : []));
+  };
+  const submit = () => { run(input.value); input.value = ''; suggest(); };
+  input.addEventListener('input', suggest);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') return submit();
+    const atEnd = input.selectionStart === input.value.length;
+    const match = (e.key === 'Tab' || (e.key === 'ArrowRight' && atEnd)) && suggestion();
+    if (!match) return; // nothing to complete: Tab moves focus as usual
+    e.preventDefault();
+    input.value = match;
+    suggest();
+  });
   $('#term-run').addEventListener('click', submit);
   // Chips, run buttons, skip and replay all carry the command they run in data-run
   addEventListener('click', (e) => {
     const trigger = e.target.closest('[data-run]');
     if (trigger) run(trigger.dataset.run);
   });
+
+  /* ---------- Project preview ----------
+     Clicking an unlocked card opens a small window that plays the card's .demo steps one by one. */
+  const preview = $('#preview');
+  const stepList = $('#preview-steps');
+  const shot = $('#preview-shot');
+  let demo = [];
+  let timer = 0;
+  const play = () => {
+    clearTimeout(timer);
+    stepList.replaceChildren();
+    const queue = demo.map((line) => line.cloneNode(true));
+    const tick = () => {
+      if (!queue.length) return;
+      stepList.append(queue.shift());
+      timer = setTimeout(tick, calm ? 0 : 650);
+    };
+    tick();
+  };
+  $('#projects').addEventListener('click', (e) => {
+    const card = e.target.closest('.card');
+    const locked = card && card.dataset.unlock && !card.classList.contains('is-unlocked') && !done();
+    if (!card || locked || e.target.closest('a, [data-run]')) return;
+    demo = $$('.demo > li', card);
+    if (!demo.length) return;
+    $('#preview-title').textContent = $('.card-title', card).textContent;
+    shot.hidden = !card.dataset.shot;
+    if (card.dataset.shot) shot.src = card.dataset.shot;
+    preview.showModal();
+    play();
+  });
+  $('#preview-replay').addEventListener('click', play);
+  // Close on the close button or a click on the backdrop; Escape is handled by <dialog>
+  preview.addEventListener('click', (e) => (e.target === preview || e.target.closest('[data-close]')) && preview.close());
+  preview.addEventListener('close', () => clearTimeout(timer));
 
   render();
   print('', done() ? 'everything is unlocked.' : unlocked ? `welcome back. ${unlocked}/${total} unlocked. ` : 'run each command to print its section. ', ...(done() ? [] : next()));
