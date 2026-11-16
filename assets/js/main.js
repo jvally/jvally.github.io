@@ -1,234 +1,187 @@
 (() => {
   'use strict';
 
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (selector, scope = document) => scope.querySelector(selector);
+  const $$ = (selector, scope = document) => [...scope.querySelectorAll(selector)];
+  const root = document.documentElement;
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const scrollTo = (node, block = 'start') => node.scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block });
+  // Text is always set with textContent, never as HTML
+  const make = (tag, className, text = '') => Object.assign(document.createElement(tag), { className, textContent: text });
 
-  /* --- Mobile menu --- */
-  function initMobileMenu() {
-    const toggle = document.getElementById('menu-toggle');
-    const menu = document.getElementById('mobile-menu');
-    if (!toggle || !menu) return;
+  /* ---------- Navigation ---------- */
+  const nav = $('#nav');
+  const toggle = $('#menu-toggle');
+  const setMenu = (open) => {
+    nav.classList.toggle('open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+  };
+  toggle.addEventListener('click', () => setMenu(!nav.classList.contains('open')));
+  nav.addEventListener('click', (e) => e.target.closest('a') && setMenu(false));
+  addEventListener('keydown', (e) => e.key === 'Escape' && setMenu(false));
 
-    const setOpen = (open) => {
-      menu.classList.toggle('hidden', !open);
-      toggle.setAttribute('aria-expanded', String(open));
+  // Highlight the link of the section in view
+  const links = $$('a', nav);
+  const spy = new IntersectionObserver((entries) => entries.forEach((entry) => {
+    if (entry.isIntersecting) links.forEach((a) => a.classList.toggle('active', a.hash === '#' + entry.target.id));
+  }), { rootMargin: '-45% 0px -50% 0px' });
+  $$('main section[id]').forEach((section) => spy.observe(section));
+
+  $('#year').textContent = new Date().getFullYear();
+
+  /* ---------- Motion ---------- */
+  // Sections fade up as they enter the viewport
+  const reveal = new IntersectionObserver((entries) => entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add('in');
+    reveal.unobserve(entry.target);
+  }), { threshold: 0.05 });
+  $$('.reveal').forEach((node) => reveal.observe(node));
+
+  // The paper plane loops when clicked and whenever a step unlocks
+  const plane = $('#plane');
+  const planeBody = $('.plane-body', plane);
+  const loop = () => planeBody.classList.add('loop');
+  planeBody.addEventListener('animationend', () => planeBody.classList.remove('loop'));
+  plane.addEventListener('click', loop);
+
+  // Clouds drift with scroll and pointer; the plane turns to face the pointer
+  if (!calm) {
+    let pointer = null;
+    let heading = 55;
+    let queued = false;
+    const paint = () => {
+      queued = false;
+      const range = root.scrollHeight - innerHeight;
+      root.style.setProperty('--sp', range > 0 ? scrollY / range : 0);
+      if (!pointer) return;
+      root.style.setProperty('--px', pointer.clientX / innerWidth - 0.5);
+      root.style.setProperty('--py', pointer.clientY / innerHeight - 0.5);
+      const box = plane.ownerSVGElement.getBoundingClientRect();
+      const target = Math.atan2(pointer.clientY - (box.top + box.height / 2), pointer.clientX - (box.left + box.width / 2)) * 180 / Math.PI + 90;
+      heading += ((target - heading) % 360 + 540) % 360 - 180; // turn the short way round
+      plane.style.rotate = heading + 'deg';
     };
-    toggle.addEventListener('click', () => setOpen(menu.classList.contains('hidden')));
-    menu.addEventListener('click', (e) => { if (e.target.closest('a')) setOpen(false); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+    const queue = () => {
+      if (!queued) queued = requestAnimationFrame(paint);
+    };
+    addEventListener('scroll', queue, { passive: true });
+    addEventListener('pointermove', (e) => { pointer = e; queue(); }, { passive: true });
+    paint();
   }
 
-  /* --- Smooth scrolling for in-page links --- */
-  function initSmoothScroll() {
-    document.querySelectorAll('a[href^="#"]').forEach((link) => {
-      link.addEventListener('click', (e) => {
-        const id = link.getAttribute('href').slice(1);
-        const target = id && document.getElementById(id); // getElementById: no selector injection
-        if (!target) return;
-        e.preventDefault();
-        target.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
-        history.replaceState(null, '', '#' + id);
-      });
-    });
-  }
+  /* ---------- Unlock game ----------
+     Every [data-unlock] element is one step, in page order; entering its value reveals it.
+     Visitor input is only compared as a string and echoed as text. */
+  const output = $('#term-output');
+  const input = $('#term-input');
+  const norm = (value) => value.trim().replace(/\s+/g, ' ').replace(/\/$/, '').toLowerCase();
+  const chip = (command, className = 'cmd-chip', label = command) => {
+    const button = make('button', className, label);
+    button.type = 'button';
+    button.dataset.run = command;
+    return button;
+  };
+  const store = (key, value) => {
+    try {
+      return value === undefined ? localStorage.getItem(key) : localStorage.setItem(key, value);
+    } catch (e) {
+      return null;
+    }
+  };
 
-  /* --- Highlight the nav link of the section in view --- */
-  function initActiveNav() {
-    const links = document.querySelectorAll('.nav-link[href^="#"]');
-    const sections = document.querySelectorAll('main section[id]');
-    if (!('IntersectionObserver' in window) || !sections.length) return;
+  const steps = $$('[data-unlock]').map((node) => {
+    const answer = node.dataset.unlock.trim();
+    const isFlag = answer.startsWith('flag{');
+    const panel = node.appendChild(make('div', 'lock-panel'));
+    // A flag is "found" at the bottom of the card before the one it unlocks
+    let drop = null;
+    if (isFlag && node.previousElementSibling) {
+      drop = node.previousElementSibling.appendChild(make('p', 'flag-drop', 'flag found:'));
+      drop.append(chip(answer));
+    }
+    return { node, answer, key: norm(answer), isFlag, panel, drop, section: isFlag ? null : node.closest('section') };
+  });
+  const total = steps.length;
+  let unlocked = store('vj:done') === '1' ? total : Math.min(Number(store('vj:unlocked')) || 0, total);
+  const done = () => unlocked >= total;
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        links.forEach((l) => l.classList.toggle('active', l.getAttribute('href') === '#' + entry.target.id));
-      });
-    }, { rootMargin: '-45% 0px -50% 0px' });
+  const next = () => {
+    if (done()) return ['everything is unlocked.'];
+    const step = steps[unlocked];
+    return step.isFlag ? ['next: submit the flag at the bottom of the last project.'] : ['next: run ', chip(step.answer)];
+  };
+  const print = (echo, ...parts) => {
+    const reply = make('span', 'block');
+    reply.append(...parts);
+    output.replaceChildren(...(echo ? [make('span', 'term-echo', '$ ' + echo)] : []), reply);
+  };
 
-    sections.forEach((s) => observer.observe(s));
-  }
-
-  /* --- Footer year --- */
-  function initYear() {
-    const el = document.getElementById('year');
-    if (el) el.textContent = String(new Date().getFullYear());
-  }
-
-  /* --- Unlock game ---------------------------------------------------------
-     Every element with a data-unlock attribute is one step, in page order.
-     Entering that attribute's value in the terminal reveals the element.
-     Visitor input is only ever compared as a string and echoed with
-     textContent; it is never evaluated or inserted as HTML. */
-  function initGame() {
-    const root = document.documentElement;
-    const output = document.getElementById('term-output');
-    const input = document.getElementById('term-input');
-    const runBtn = document.getElementById('term-run');
-    const progress = document.getElementById('term-progress');
-    if (!root.classList.contains('game') || !output || !input) return;
-
-    const STORE_COUNT = 'vj:unlocked';
-    const STORE_DONE = 'vj:done';
-    const norm = (v) => v.trim().replace(/\s+/g, ' ').replace(/\/$/, '').toLowerCase();
-    const el = (tag, className, text) => {
-      const node = document.createElement(tag);
-      if (className) node.className = className;
-      if (text) node.textContent = text;
-      return node;
-    };
-    const chip = (cmd) => {
-      const b = el('button', 'cmd-chip', cmd);
-      b.type = 'button';
-      b.dataset.run = cmd;
-      return b;
-    };
-    const store = {
-      get(key) { try { return window.localStorage.getItem(key); } catch (e) { return null; } },
-      set(key, value) { try { window.localStorage.setItem(key, value); } catch (e) { /* ignore */ } },
-    };
-
-    const steps = Array.from(document.querySelectorAll('[data-unlock]')).map((node) => {
-      const answer = node.dataset.unlock.trim();
-      const isFlag = /^flag\{/i.test(answer);
-      // A section body carries data-unlock; its <section> keeps the command visible while locked
-      const section = isFlag ? null : node.closest('section');
-
-      // Lock panel shown in place of the element's content while it is locked
-      const panel = el('div', 'lock-panel');
-      node.append(panel);
-
-      // A flag is "found" at the bottom of the element just before the one it unlocks
-      let drop = null;
-      const carrier = node.previousElementSibling;
-      if (isFlag && carrier) {
-        drop = el('p', 'flag-drop');
-        drop.append(el('span', '', 'flag found:'), chip(answer));
-        carrier.append(drop);
+  function render() {
+    steps.forEach((step, i) => {
+      const open = i < unlocked;
+      const isNext = i === unlocked;
+      step.node.classList.toggle('is-unlocked', open);
+      if (step.drop) step.drop.classList.toggle('is-used', open);
+      if (step.section) {
+        step.section.classList.toggle('is-locked', !open);
+        step.section.classList.toggle('is-next', isNext);
       }
-      return { node, answer, key: norm(answer), isFlag, section, panel, drop };
+      if (open) step.panel.replaceChildren();
+      else if (step.isFlag) step.panel.replaceChildren(make('p', 'lock-title', 'encrypted'), isNext ? 'Submit the flag from the project above.' : '');
+      else step.panel.replaceChildren(...(isNext ? [chip(step.answer, 'run-btn', 'run ↵'), make('span', 'run-note', 'or type it in the terminal below')] : []));
     });
-    if (!steps.length) return;
+    root.classList.toggle('done', done());
+    $('#term-progress').textContent = unlocked + '/' + total;
+    // The dial has one segment per step
+    const arc = 80 / total;
+    $('#dial-progress').setAttribute('stroke-dasharray', `${(arc - 1 + ' 1 ').repeat(unlocked)}0 80`);
+    store('vj:unlocked', unlocked);
+    store('vj:done', done() ? '1' : '0');
+  }
 
-    let unlocked = Math.min(parseInt(store.get(STORE_COUNT), 10) || 0, steps.length);
-    if (store.get(STORE_DONE) === '1') unlocked = steps.length;
+  const commands = new Map([
+    ['help', () => ['commands: help, hint, whoami, reset, skip']],
+    ['hint', () => [unlocked + '/' + total + ' unlocked. ', ...next()]],
+    ['whoami', () => [done() ? 'root' : 'visitor (unlock everything to become root)']],
+    ['reset', () => { unlocked = 0; render(); scrollTo(document.body); return ['locked everything again. ', ...next()]; }],
+    ['skip', () => { unlocked = total; render(); return ['skipped. everything is unlocked.']; }],
+  ]);
 
-    const nextHint = () => {
-      const next = steps[unlocked];
-      if (!next) return ['everything is unlocked.'];
-      return next.isFlag
-        ? ['next: submit the flag at the bottom of the last project.']
-        : ['next: run ', chip(next.answer)];
-    };
+  function run(raw) {
+    const typed = raw.trim().replace(/\s+/g, ' ').slice(0, 80);
+    if (!typed) return;
+    const index = steps.findIndex((step) => step.key === norm(typed.replace(/^submit /i, '')));
+    const step = steps[index];
+    const command = commands.get(typed.toLowerCase().replace('sudo unlock --all', 'skip'));
 
-    function print(echo, parts) {
-      output.replaceChildren();
-      if (echo) output.append(el('span', 'term-echo', '$ ' + echo));
-      const reply = el('span', 'term-reply');
-      reply.append(...parts);
-      output.append(reply);
-    }
-
-    function render() {
-      const done = unlocked >= steps.length;
-      steps.forEach((step, i) => {
-        step.node.classList.toggle('is-unlocked', i < unlocked);
-        if (step.drop) step.drop.classList.toggle('is-used', i < unlocked);
-        if (step.section) {
-          step.section.classList.toggle('is-locked', i >= unlocked);
-          step.section.classList.toggle('is-next', i === unlocked);
-        }
-        if (i < unlocked) return;
-        const isNext = i === unlocked;
-        if (step.isFlag) {
-          // Locked project card
-          step.panel.replaceChildren(el('p', 'lock-title', 'encrypted'));
-          if (isNext) step.panel.append(el('p', 'lock-hint', 'Submit the flag from the project above.'));
-        } else if (isNext) {
-          // The next command in the queue gets a run button
-          const btn = el('button', 'run-btn', 'run');
-          btn.type = 'button';
-          btn.dataset.run = step.answer;
-          btn.append(el('span', '', '\u21B5'));
-          btn.lastChild.setAttribute('aria-hidden', 'true');
-          step.panel.replaceChildren(btn, el('span', 'run-note', 'or type it in the terminal below'));
-        } else {
-          step.panel.replaceChildren();
-        }
-      });
-      root.classList.toggle('game-done', done);
-      progress.textContent = unlocked + '/' + steps.length;
-      store.set(STORE_COUNT, String(unlocked));
-      store.set(STORE_DONE, done ? '1' : '0');
-    }
-
-    function reveal(step) {
+    if (index === unlocked) {
+      unlocked += 1;
+      render();
       step.node.classList.add('just-unlocked');
       step.node.addEventListener('animationend', () => step.node.classList.remove('just-unlocked'), { once: true });
-      (step.section || step.node).scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: step.isFlag ? 'center' : 'start' });
+      scrollTo(step.section || step.node, step.isFlag ? 'center' : 'start');
+      loop();
+      print(typed, done() ? 'access granted. everything is unlocked.' : `access granted (${unlocked}/${total}). `, ...(done() ? [] : next()));
+    } else if (index > unlocked) {
+      print(typed, 'permission denied: not yet. ', ...next());
+    } else if (step) {
+      scrollTo(step.section || step.node, step.isFlag ? 'center' : 'start');
+      print(typed, 'already unlocked. ', ...next());
+    } else {
+      print(typed, ...(command ? command() : [`command not found: ${typed.split(' ')[0].slice(0, 30)}. try help`]));
     }
-
-    function run(raw) {
-      const typed = raw.trim().replace(/\s+/g, ' ').slice(0, 80);
-      if (!typed) return;
-      const command = typed.toLowerCase();
-      const index = steps.findIndex((s) => s.key === norm(typed.replace(/^submit /i, '')));
-
-      if (index !== -1 && index < unlocked) {
-        print(typed, ['already unlocked. ', ...nextHint()]);
-        (steps[index].section || steps[index].node).scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: steps[index].isFlag ? 'center' : 'start' });
-      } else if (index === unlocked) {
-        unlocked += 1;
-        render();
-        reveal(steps[index]);
-        print(typed, unlocked >= steps.length
-          ? ['root@vishesh:~# access granted. everything is unlocked.']
-          : ['access granted (' + unlocked + '/' + steps.length + '). ', ...nextHint()]);
-      } else if (index > unlocked) {
-        print(typed, ['permission denied: not yet. ', ...nextHint()]);
-      } else if (command === 'help') {
-        print(typed, ['commands: help, hint, ls, whoami, clear, reset, sudo unlock --all']);
-      } else if (command === 'hint' || command === 'ls') {
-        print(typed, [unlocked + '/' + steps.length + ' unlocked. ', ...nextHint()]);
-      } else if (command === 'whoami') {
-        print(typed, [unlocked >= steps.length ? 'root' : 'visitor (unlock everything to become root)']);
-      } else if (command === 'clear') {
-        output.replaceChildren();
-      } else if (command === 'reset') {
-        unlocked = 0;
-        render();
-        print(typed, ['locked everything again. ', ...nextHint()]);
-        window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
-      } else if (command === 'sudo unlock --all' || command === 'skip') {
-        unlocked = steps.length;
-        render();
-        print(typed, ['root@vishesh:~# game skipped. everything is unlocked.']);
-      } else if (/^sudo rm\b/.test(command)) {
-        print(typed, ['nice try.']);
-      } else {
-        print(typed, ['command not found: ' + typed.split(' ')[0].slice(0, 30) + '. try help']);
-      }
-    }
-
-    const submit = () => { run(input.value); input.value = ''; };
-    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
-    if (runBtn) runBtn.addEventListener('click', submit);
-    // Any element with data-run (chips, skip, replay) runs its command when clicked
-    document.addEventListener('click', (e) => {
-      const trigger = e.target.closest('[data-run]');
-      if (trigger) run(trigger.dataset.run);
-    });
-
-    render();
-    print('', unlocked >= steps.length
-      ? ['root@vishesh:~# everything is unlocked.']
-      : unlocked > 0
-        ? ['welcome back. ' + unlocked + '/' + steps.length + ' unlocked. ', ...nextHint()]
-        : ['run each command to print its section. ', ...nextHint()]);
   }
 
-  initMobileMenu();
-  initSmoothScroll();
-  initActiveNav();
-  initYear();
-  initGame();
+  const submit = () => { run(input.value); input.value = ''; };
+  input.addEventListener('keydown', (e) => e.key === 'Enter' && submit());
+  $('#term-run').addEventListener('click', submit);
+  // Chips, run buttons, skip and replay all carry the command they run in data-run
+  addEventListener('click', (e) => {
+    const trigger = e.target.closest('[data-run]');
+    if (trigger) run(trigger.dataset.run);
+  });
+
+  render();
+  print('', done() ? 'everything is unlocked.' : unlocked ? `welcome back. ${unlocked}/${total} unlocked. ` : 'run each command to print its section. ', ...(done() ? [] : next()));
 })();

@@ -2,24 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ============ 1. THEME TOKENS — edit colours here ============ */
+/* ============ 1. TOKENS ============ */
 :root {
-  --color-bg:        13 15 18;     /* page background          */
-  --color-surface:   20 23 28;     /* cards, inputs            */
-  --color-border:    38 43 51;     /* hairlines                */
-  --color-text:      190 197 206;  /* body text                */
-  --color-muted:     128 137 148;  /* secondary text           */
-  --color-heading:   236 239 243;  /* headings, primary button */
-  --color-accent:    126 211 158;  /* prompt green (ink only)  */
-  --header-height:   4rem;
+  --color-navy:    8 31 112;     /* dark half of panels, cards, terminal */
+  --color-azure:   17 79 196;    /* light half of panels */
+  --color-line:    255 255 255;  /* hairlines, always used with alpha */
+  --color-text:    232 240 255;
+  --color-muted:   190 210 248;
+  --color-heading: 255 255 255;
+  --color-accent:  248 150 30;   /* orange: buttons, cursor, prompt */
+  --sky: linear-gradient(180deg, #06268c 0%, #0e48c2 55%, #2079e8 100%);
+  --rail: 14.5rem;               /* width of the command column */
+  --header: 4rem;
 }
 
 /* ============ 2. BASE ============ */
 @layer base {
-  body    { @apply bg-bg text-text font-sans antialiased leading-relaxed; }
-  h1, h2, h3 { @apply font-mono text-heading; }
-  section[id] { scroll-margin-top: var(--header-height); }
-  ::selection { @apply bg-accent/25 text-heading; }
+  html { scroll-behavior: smooth; }
+  body { @apply min-h-screen font-sans leading-relaxed text-text antialiased; background: var(--sky) fixed; }
+  h1, h2, h3 { @apply text-heading; }
+  section[id] { scroll-margin-top: calc(var(--header) + 1rem); }
+  ::selection { @apply bg-accent/40 text-heading; }
   :focus-visible { @apply outline outline-2 outline-offset-2 outline-accent; }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -27,126 +30,168 @@
   }
 }
 
-/* ============ 3. COMPONENT CLASSES — edit shared styling here ============ */
+/* ============ 3. SKY ============ */
+/* Two fixed cloud layers: one behind the content, one in front at the screen edges.
+   main.js sets --sp (scroll progress 0-1) and --px / --py (pointer, -0.5 to 0.5) on <html>. */
+.sky { @apply pointer-events-none fixed inset-0 z-0 overflow-hidden; }
+.sky--front { @apply z-30 hidden lg:block; }
+.cloud {
+  @apply absolute max-w-none select-none;
+  left: var(--x); top: var(--y); width: var(--w);
+  translate:
+    calc(var(--px, 0) * var(--d) * -90px)
+    calc(var(--sp, 0) * var(--d) * -130vh + var(--py, 0) * var(--d) * -50px);
+  animation: drift var(--t) ease-in-out infinite alternate;
+  will-change: translate, transform;
+}
+@keyframes drift { to { transform: translateX(var(--dx, 5vw)); } }
+/*            position / size                depth      drift          */
+.cloud--1 { --x: -22vw; --y: -14vh; --w: 70vw;  --d: 0.25; --t: 60s; }
+.cloud--2 { --x: 48vw;  --y: 22vh;  --w: 46vw;  --d: 0.45; --t: 75s; --dx: -6vw; opacity: 0.7; }
+.cloud--3 { --x: -10vw; --y: 78vh;  --w: 54vw;  --d: 0.6;  --t: 90s; opacity: 0.85; }
+.cloud--4 { --x: 40vw;  --y: 128vh; --w: 72vw;  --d: 0.8;  --t: 70s; --dx: -4vw; }
+.cloud--5 { --x: -34vw; --y: -30vh; --w: 62vw;  --d: 1.1;  --t: 50s; --dx: 3vw; }
+.cloud--6 { --x: 80vw;  --y: 58vh;  --w: 60vw;  --d: 1.3;  --t: 55s; --dx: -3vw; }
+
+/* ============ 4. COMPONENTS ============ */
 @layer components {
-  /* Layout: every section is a two-column row, command on the left, output on the right */
-  .container-page { @apply mx-auto w-full max-w-5xl px-5 sm:px-8; }
-  .section        { @apply py-9 md:py-12; }
-  .section--hero  { @apply pb-10 pt-28 md:pb-14 md:pt-36; }
-  .section-grid   { @apply grid gap-y-4 md:grid-cols-[11rem_minmax(0,1fr)] md:gap-x-10; }
-  .section-cmd    { @apply font-mono text-sm font-medium text-heading md:sticky md:top-24 md:self-start md:pt-1; }
-  .section-cmd::before { content: '$ '; @apply text-accent; }
-  .subhead        { @apply mb-3 font-mono text-xs font-medium uppercase tracking-wider text-muted; }
+  .link { @apply text-heading underline decoration-accent decoration-2 underline-offset-4 hover:text-accent; }
 
-  /* Hero */
-  .hero-name  { @apply text-4xl font-semibold tracking-tight sm:text-6xl; }
-  .hero-sub   { @apply mt-4 max-w-2xl text-lg text-heading/90; }
-  .hero-intro { @apply mt-3 max-w-xl text-muted; }
-
-  /* Navigation */
-  .nav-link        { @apply font-mono text-sm text-muted transition-colors hover:text-heading; }
-  .nav-link.active { @apply text-accent; }
+  /* Header */
+  .site-header { @apply fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-between bg-navy/80 px-5 backdrop-blur sm:px-8; }
+  .brand { @apply font-mono text-sm font-medium text-heading; }
+  .nav { @apply absolute inset-x-0 top-16 hidden flex-col gap-4 bg-navy px-5 py-4 md:static md:flex md:flex-row md:gap-8 md:bg-transparent md:p-0; }
+  .nav.open { @apply flex; }
+  .nav a { @apply text-sm font-medium text-muted transition-colors hover:text-heading; }
+  .nav a.active { @apply text-accent; }
 
   /* Buttons */
-  .btn         { @apply inline-flex items-center justify-center rounded-md px-4 py-2 font-mono text-sm font-medium transition-colors duration-150; }
-  .btn-primary { @apply btn bg-heading text-bg hover:bg-white; }
-  .btn-ghost   { @apply btn border border-border text-heading hover:border-muted; }
+  .btn { @apply inline-flex items-center justify-center px-5 py-2.5 text-xs font-semibold uppercase tracking-widest transition duration-150; }
+  .btn-primary { @apply btn bg-accent text-navy hover:-translate-y-0.5 hover:brightness-110; }
+  .btn-ghost { @apply btn border border-line/40 text-heading hover:bg-line/10; }
+
+  /* Panels float over the sky. A section is a dark rail (the command) beside a lighter body (its output). */
+  .panel { @apply relative z-10 mx-auto bg-azure/95; width: min(100% - 2rem, 64rem); box-shadow: 0 30px 60px -30px rgb(3 14 70 / 0.8); }
+  .section { @apply mt-5; }
+  .cmd { @apply whitespace-nowrap bg-navy/90 px-5 py-4 font-mono text-sm font-medium text-heading; }
+  .cmd::before { content: '$ '; @apply text-accent; }
+  .body { @apply px-4 py-6 sm:px-6; }
+  @screen md {
+    .section {
+      @apply grid;
+      grid-template-columns: var(--rail) minmax(0, 1fr);
+      background: linear-gradient(90deg, rgb(var(--color-navy) / 0.95) var(--rail), rgb(var(--color-azure) / 0.94) var(--rail));
+    }
+    .cmd { @apply sticky top-20 self-start bg-transparent py-8; }
+    .body { @apply px-10 py-8; }
+  }
+  .subhead { @apply mb-3 text-xs font-semibold uppercase tracking-widest text-muted; }
+
+  /* Hero: two-tone panel with the dial on the seam */
+  .hero { @apply grid gap-8 px-6 pb-12 pt-10 text-center; margin-top: calc(var(--header) + 1.5rem); background: linear-gradient(180deg, rgb(var(--color-navy) / 0.92), rgb(var(--color-azure) / 0.9)); }
+  .hero-aside { @apply mx-auto max-w-sm text-sm; }
+  .hero-sub { @apply text-base font-medium text-heading; }
+  .hero-intro { @apply mt-3 text-muted; }
+  .hero-actions { @apply mt-5 flex flex-wrap justify-center gap-3; }
+  @screen lg {
+    .hero {
+      @apply items-center gap-10 px-10 py-14;
+      grid-template-columns: 1fr 24rem 1fr;
+      min-height: 33rem;
+      background: linear-gradient(90deg, rgb(var(--color-navy) / 0.94) 50%, rgb(var(--color-azure) / 0.92) 50%);
+    }
+    .hero-aside { @apply mx-0; }
+    .hero-aside--left { @apply order-first justify-self-end text-right; }
+    .hero-aside--right { @apply border-l-2 border-dotted border-line/40 pl-5 text-left; }
+    .hero-actions { @apply justify-start; }
+  }
+
+  /* Dial */
+  .dial-wrap { @apply relative mx-auto aspect-square w-full max-w-sm; }
+  .dial { @apply h-full w-full overflow-visible; }
+  .hero-name { @apply absolute inset-x-0 top-[17%] z-10 -rotate-3 whitespace-nowrap font-display text-5xl sm:text-7xl; text-shadow: 0 4px 18px rgb(3 14 70 / 0.55); }
+  .hero-down { @apply absolute -bottom-5 left-1/2 z-10 grid h-10 w-10 -translate-x-1/2 place-items-center rounded-full bg-heading text-accent shadow-lg; animation: bob 2.4s ease-in-out infinite; }
+  .dial-disc     { fill: rgb(var(--color-line) / 0.07); }
+  .dial-ticks    { fill: none; stroke: rgb(var(--color-line) / 0.35); stroke-width: 6; stroke-dasharray: 1.5 9; animation: spin 120s linear infinite; }
+  .dial-track    { fill: none; stroke: rgb(var(--color-navy) / 0.55); stroke-width: 30; }
+  .dial-progress { fill: none; stroke: rgb(var(--color-accent)); stroke-width: 30; }
+  .dial-core     { fill: rgb(var(--color-azure)); stroke: rgb(var(--color-line) / 0.25); stroke-width: 1.5; }
+  .dial-label    { fill: rgb(var(--color-heading)); font-size: 13px; font-weight: 600; letter-spacing: 0.22em; }
+  .plane      { rotate: 55deg; transition: rotate 700ms cubic-bezier(0.2, 0.8, 0.2, 1); cursor: pointer; }
+  .plane-body { animation: sway 5s ease-in-out infinite; }
+  .plane-body.loop { animation: loop 900ms ease-in-out; }
 
   /* Cards */
-  .card       { @apply flex flex-col rounded-lg border border-border bg-surface/60 p-5 transition duration-200 sm:p-6; }
-  .card-hover { @apply hover:-translate-y-0.5 hover:border-accent/40 hover:bg-surface hover:shadow-lift; }
-  .card-head  { @apply flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1; }
+  .card { @apply flex flex-col border border-line/15 bg-navy/60 p-5 transition duration-200 sm:p-6; }
+  .card-hover:hover { @apply -translate-y-1 border-line/50 bg-navy/80; box-shadow: 0 0 0 1px rgb(var(--color-line) / 0.2), 0 20px 40px -20px rgb(3 14 70 / 0.9); }
+  .card-head { @apply flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1; }
   .card-title { @apply text-base font-semibold; }
-  .card-date  { @apply font-mono text-xs text-muted; }
-  .card-body  { @apply mt-2 text-sm; }
-  .card-list  { @apply mt-3 list-none space-y-2 text-sm text-muted; }
+  .card-date { @apply font-mono text-xs text-muted; }
+  .card-body { @apply mt-2 text-sm; }
+  .card-list { @apply mt-3 list-none space-y-2 text-sm text-muted; }
   .card-list > li { @apply relative pl-4; }
-  .card-list > li::before { content: ''; @apply absolute left-0 top-[0.7em] h-px w-2 bg-muted/60; }
+  .card-list > li::before { content: ''; @apply absolute left-0 top-[0.7em] h-px w-2 bg-accent; }
   .card-stack { @apply mt-auto pt-5 font-mono text-xs text-muted; }
-  .card-link  { @apply mt-4 inline-flex items-center gap-1 self-start font-mono text-xs text-accent underline-offset-4 hover:underline; }
+  .card-link { @apply link mt-4 self-start text-sm; }
 
-  /* Key/value list (about) */
-  .kv      { @apply space-y-1.5 font-mono text-sm; }
+  /* Small pieces */
+  .kv { @apply space-y-1.5 font-mono text-sm; }
   .kv > div { @apply flex gap-4; }
-  .kv dt   { @apply w-16 shrink-0 text-muted; }
-  .kv dd   { @apply text-text; }
-
-  /* Entries (experience) */
-  .entries > li + li { @apply mt-8 border-t border-border pt-8; }
+  .kv dt { @apply w-16 shrink-0 text-muted; }
+  .entries > li + li { @apply mt-7 border-t border-line/15 pt-7; }
   .entry-org { @apply mt-1 font-mono text-xs text-muted; }
-
-  /* Contact */
-  .contact-email { @apply break-all font-mono text-xl font-medium text-heading underline decoration-accent/50 decoration-1 underline-offset-8 transition-colors hover:decoration-accent sm:text-2xl; }
-
-  /* Misc */
-  .link { @apply text-accent underline-offset-4 hover:underline; }
+  .contact-email { @apply link break-all text-2xl font-semibold sm:text-3xl; }
+  .footer { @apply relative z-10 mx-auto mt-10 flex flex-col items-center justify-between gap-4 py-8 text-sm text-muted sm:flex-row; width: min(100% - 2rem, 64rem); }
 }
 
-/* ============ 4. GAME (terminal unlock) ============
-   Everything here applies only once assets/js/boot.js has added `game` to <html>.
-   `game-done` is added when every step is unlocked or the visitor skips.
-   A locked section keeps its command visible and prints its body when the command is run. */
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes bob  { 50% { transform: translate(-50%, 6px); } }
+@keyframes sway { 50% { transform: rotate(7deg) translateY(-5px); } }
+@keyframes loop { 50% { transform: rotate(180deg) scale(1.35); } 100% { transform: rotate(360deg); } }
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } }
 
-/* Hidden by default (no JavaScript, or game finished) */
-.terminal-dock, .game-only, .flag-drop, .lock-panel { display: none; }
-html.game .terminal-dock { display: block; }
-html.game:not(.game-done) .game-only { display: block; }
-html.game:not(.game-done) .flag-drop:not(.is-used) { display: flex; }
-html.game body { padding-bottom: 9rem; }
-html.game.game-done body { padding-bottom: 3.5rem; }
+/* ============ 5. SCRIPTED STATES ============
+   These apply only once boot.js has added `js` to <html>. `done` is added when every step
+   is unlocked or the visitor skips. Without JavaScript the whole page is simply visible. */
+.terminal, .js-only, .flag-drop, .lock-panel { display: none; }
 
-/* A locked element hides its content and shows its lock panel */
-html.game:not(.game-done) [data-unlock]:not(.is-unlocked) > :not(.lock-panel) { display: none; }
-html.game:not(.game-done) [data-unlock]:not(.is-unlocked) > .lock-panel { display: block; }
+/* Scroll reveal */
+html.js .reveal { opacity: 0; translate: 0 28px; transition: opacity 700ms ease, translate 700ms ease; }
+html.js .reveal.in { opacity: 1; translate: 0 0; }
+
+/* Unlock game: a locked element hides its content and shows its lock panel */
+html.js .terminal { display: block; }
+html.js body { padding-bottom: 9rem; }
+html.js.done body { padding-bottom: 3.5rem; }
+html.js:not(.done) .js-only { display: block; }
+html.js:not(.done) .flag-drop:not(.is-used) { display: flex; }
+html.js:not(.done) [data-unlock]:not(.is-unlocked) > :not(.lock-panel) { display: none; }
+html.js:not(.done) [data-unlock]:not(.is-unlocked) > .lock-panel { display: block; }
+.just-unlocked { animation: rise 500ms ease-out; }
 
 /* Locked sections collapse to one line each: a queue of commands waiting to be run */
-html.game:not(.game-done) .section.is-locked { @apply py-2; }
-html.game:not(.game-done) .section.is-locked .section-grid { @apply items-center gap-y-2; }
-html.game:not(.game-done) .section.is-locked .section-cmd { @apply static pt-0 text-muted; }
-html.game:not(.game-done) .section.is-locked:not(.is-next) .section-body { display: none; }
-html.game:not(.game-done) .section.is-next .section-cmd { @apply text-heading; }
-html.game:not(.game-done) .section.is-next .section-cmd::after {
-  content: '';
-  @apply ml-2 inline-block h-[1.1em] w-[0.55em] bg-accent align-text-bottom;
-  animation: blink 1.1s steps(1) infinite;
-}
-@keyframes blink { 50% { opacity: 0; } }
+html.js:not(.done) .section.is-locked { @apply mt-2 items-center; }
+html.js:not(.done) .section.is-locked .cmd { @apply static py-3 text-muted; }
+html.js:not(.done) .section.is-locked .body { @apply py-3; }
+html.js:not(.done) .section.is-locked:not(.is-next) .body { display: none; }
+html.js:not(.done) .section.is-next .cmd { @apply text-heading; }
+html.js:not(.done) .section.is-next .cmd::after { content: ''; @apply ml-2 inline-block h-[1.1em] w-[0.55em] bg-accent align-text-bottom; animation: blink 1.1s steps(1) infinite; }
+html.js:not(.done) .card[data-unlock]:not(.is-unlocked) { @apply translate-y-0 justify-center border-dashed border-line/30 bg-transparent shadow-none; min-height: 6.5rem; }
 
-/* Locked project cards */
-html.game:not(.game-done) .card[data-unlock]:not(.is-unlocked) {
-  @apply translate-y-0 justify-center border-dashed border-border bg-transparent shadow-none;
-  min-height: 6.5rem;
-}
-
-/* Lock panel */
 .lock-panel { @apply font-mono text-xs text-muted; }
 .lock-title { @apply text-text; }
-.lock-hint  { @apply mt-1; }
-.run-btn    { @apply inline-flex items-center gap-2 rounded border border-accent/40 px-2.5 py-1 text-accent transition-colors hover:bg-accent/10; }
-.run-note   { @apply ml-3 hidden sm:inline; }
+.run-btn  { @apply bg-accent px-3 py-1.5 font-semibold uppercase tracking-widest text-navy transition hover:brightness-110; }
+.run-note { @apply ml-3 hidden sm:inline; }
+.cmd-chip { @apply border border-accent/60 px-1.5 py-0.5 font-mono text-xs text-accent transition-colors hover:bg-accent hover:text-navy; }
+.flag-drop { @apply mt-5 flex-wrap items-center gap-2 border-t border-dashed border-line/25 pt-4 font-mono text-xs text-muted; }
 
-/* Clickable command / flag */
-.cmd-chip  { @apply inline-flex items-center rounded border border-accent/40 px-1.5 py-0.5 font-mono text-xs text-accent transition-colors hover:bg-accent/10; }
-.flag-drop { @apply mt-5 flex-wrap items-center gap-2 border-t border-dashed border-border pt-4 font-mono text-xs text-muted; }
-
-/* Reveal animation */
-.just-unlocked { animation: unlock-in 500ms ease-out; }
-@keyframes unlock-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: none; }
-}
-
-/* Terminal dock */
-.terminal-dock   { @apply fixed inset-x-0 bottom-0 z-50 border-t border-border bg-bg/95 font-mono text-xs backdrop-blur; }
-.term-output     { @apply min-w-0 flex-1 text-muted; }
-.term-echo       { @apply block truncate text-muted; }
-.term-reply      { @apply block text-text; }
-.term-progress   { @apply shrink-0 py-1 text-muted; }
-.term-btn        { @apply shrink-0 rounded border border-border px-2 py-1 text-muted transition-colors hover:border-muted hover:text-heading; }
-.term-btn--primary { @apply border-accent/40 text-accent hover:border-accent/40 hover:bg-accent/10 hover:text-accent; }
-.term-input-row  { @apply mt-2 flex items-center gap-2; }
-.term-prompt     { @apply shrink-0 text-accent; }
-.term-input      { @apply min-w-0 flex-1 rounded border border-border bg-surface px-2 py-1.5 text-base text-heading placeholder:text-muted/70 focus:border-accent/60 focus:outline-none sm:text-sm; }
-html.game-done .term-input-row,
-html.game-done [data-game="skip"] { display: none; }
-html:not(.game-done) [data-game="replay"] { display: none; }
+/* Terminal bar */
+.terminal { @apply fixed inset-x-0 bottom-0 z-50 border-t border-line/15 bg-navy/95 font-mono text-xs backdrop-blur; }
+.terminal-inner { @apply mx-auto py-2; width: min(100% - 2rem, 64rem); }
+.term-output { @apply min-w-0 flex-1 text-text; }
+.term-echo { @apply block truncate text-muted; }
+.term-btn { @apply shrink-0 border border-line/25 px-2 py-1 text-muted transition-colors hover:border-line/60 hover:text-heading; }
+.term-input { @apply min-w-0 flex-1 border border-line/25 bg-navy px-2 py-1.5 text-base text-heading placeholder:text-muted/60 focus:border-accent focus:outline-none sm:text-sm; }
+html.done .term-row, html.done [data-run="skip"] { display: none; }
+html:not(.done) [data-run="reset"] { display: none; }

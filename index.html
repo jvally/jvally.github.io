@@ -1,302 +1,258 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!--
-    SECURITY: Content Security Policy. No inline scripts or styles are allowed.
-    Add any new CDN, font host or image host here or the browser will block it.
-    (frame-ancestors cannot be set from a meta tag; GitHub Pages does not let you set headers.)
-  -->
+  <!-- CSP: no inline scripts or styles. Add any new font, script or image host here or it is blocked. -->
   <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self';
-                 script-src 'self';
-                 style-src 'self' https://fonts.googleapis.com;
-                 font-src https://fonts.gstatic.com;
-                 img-src 'self' data:;
-                 connect-src 'self';
-                 object-src 'none';
-                 base-uri 'self';
-                 form-action 'none';" />
+        content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com;
+                 font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self';
+                 object-src 'none'; base-uri 'self'; form-action 'none';" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
 
   <title>Vishesh Jally</title>
   <meta name="description" content="Vishesh Jally, Computer Science undergraduate at the National University of Singapore. Software engineering, web application security and penetration testing." />
-  <meta name="theme-color" content="#0d0f12" />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230d0f12'/%3E%3Cpath d='M8 11l6 5-6 5' fill='none' stroke='%237ed39e' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M17 22h7' stroke='%237ed39e' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <meta name="theme-color" content="#06268c" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-16 -16 32 32'%3E%3Ccircle r='16' fill='%230e48c2'/%3E%3Cpath d='M0-11-8 8-1.5 5.5z' fill='%23fff'/%3E%3Cpath d='M0-11 8 8 1.5 5.5z' fill='%23dbe8ff'/%3E%3Cpath d='M0-11-1.5 5.5 0 9.5 1.5 5.5z' fill='%23f8961e'/%3E%3C/svg%3E" />
 
-  <!-- Fonts: IBM Plex Mono (headings, labels) + IBM Plex Sans (body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Kaushan+Script&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
 
-  <!-- Compiled from src/input.css by `npm run build` (theme tokens and component classes live there) -->
   <link rel="stylesheet" href="assets/css/styles.css" />
-  <!-- boot.js is deliberately not deferred: it switches the unlock game on before first paint -->
   <script src="assets/js/boot.js"></script>
   <script src="assets/js/main.js" defer></script>
 </head>
 
 <body>
-  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded focus:bg-surface focus:px-3 focus:py-2">Skip to content</a>
+  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-navy focus:px-3 focus:py-2">Skip to content</a>
 
-  <!-- ==================== HEADER / NAV ==================== -->
-  <header id="site-header" class="fixed inset-x-0 top-0 z-50 border-b border-border/70 bg-bg/90 backdrop-blur">
-    <div class="container-page flex h-16 items-center justify-between">
-      <a href="#hero" class="font-mono text-sm font-semibold text-heading">
-        <span class="text-accent">~/</span>vishesh
-      </a>
+  <!-- Clouds behind the content -->
+  <div class="sky" aria-hidden="true">
+    <img class="cloud cloud--1" src="assets/img/cloud-1.webp" alt="" />
+    <img class="cloud cloud--2" src="assets/img/cloud-2.webp" alt="" />
+    <img class="cloud cloud--3" src="assets/img/cloud-2.webp" alt="" />
+    <img class="cloud cloud--4" src="assets/img/cloud-1.webp" alt="" />
+  </div>
 
-      <!-- Desktop nav -->
-      <nav aria-label="Primary" class="hidden gap-8 md:flex">
-        <a class="nav-link" href="#about">About</a>
-        <a class="nav-link" href="#projects">Projects</a>
-        <a class="nav-link" href="#experience">Experience</a>
-        <a class="nav-link" href="#contact">Contact</a>
-      </nav>
-
-      <!-- Mobile toggle -->
-      <button id="menu-toggle" type="button" class="rounded p-2 text-heading md:hidden"
-              aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
-        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-          <path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" />
-        </svg>
-      </button>
-    </div>
-
-    <!-- Mobile nav -->
-    <nav id="mobile-menu" aria-label="Mobile" class="hidden border-t border-border/70 bg-bg md:hidden">
-      <div class="container-page flex flex-col gap-4 py-4">
-        <a class="nav-link" href="#about">About</a>
-        <a class="nav-link" href="#projects">Projects</a>
-        <a class="nav-link" href="#experience">Experience</a>
-        <a class="nav-link" href="#contact">Contact</a>
-      </div>
+  <header class="site-header">
+    <a class="brand" href="#hero"><span class="text-accent">~/</span>vishesh</a>
+    <button id="menu-toggle" type="button" class="p-2 text-heading md:hidden" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav">
+      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" /></svg>
+    </button>
+    <nav id="nav" class="nav" aria-label="Primary">
+      <a href="#about">About</a>
+      <a href="#projects">Projects</a>
+      <a href="#experience">Experience</a>
+      <a href="#contact">Contact</a>
     </nav>
   </header>
 
   <!--
-    PAGE STRUCTURE
-    The page reads as one shell session. Every section is the same two-column row:
-      .section-cmd   the command, in the left rail (sticky on desktop)
-      .section-body  its output, on the right
-    UNLOCK GAME: data-unlock is the command or flag a visitor must enter to reveal that element.
-    Steps unlock in page order. A card's flag is shown automatically at the bottom of the card before it.
-    Remove a data-unlock attribute to make that element always visible.
+    Every section is a .cmd (the command) beside a .body (its output).
+    data-unlock is the command or flag a visitor enters to reveal that element; steps unlock in page order.
+    A card's flag appears automatically at the bottom of the card before it. Remove data-unlock to exempt an element.
   -->
   <main id="main">
-    <!-- ==================== HERO ==================== -->
-    <section id="hero" class="section section--hero">
-      <div class="container-page section-grid">
-        <p class="section-cmd" aria-hidden="true">whoami</p>
-        <div class="section-body">
-          <h1 class="hero-name">Vishesh Jally</h1>
-          <p class="hero-sub">Computer Science Undergraduate at the National University of Singapore.</p>
-          <p class="hero-intro">
-            I build web applications, then look for the ways they break. My focus is software
-            engineering, web application vulnerabilities and penetration testing.
-          </p>
-          <div class="mt-8 flex flex-wrap gap-3">
-            <a class="btn-primary" href="https://github.com/jvally" target="_blank" rel="noopener noreferrer">View GitHub</a>
-            <a class="btn-ghost" href="#contact">Contact Me</a>
-          </div>
-          <!-- Shown only while the unlock game is running -->
-          <p class="game-only mt-8 max-w-xl font-mono text-xs text-muted">
-            This page is a shell session. Run each command below to print its section, or
-            <button type="button" class="link" data-run="sudo unlock --all">show everything</button>.
-          </p>
+    <section id="hero" class="panel hero">
+      <div class="dial-wrap">
+        <h1 class="hero-name">Vishesh Jally</h1>
+        <svg class="dial" viewBox="-200 -200 400 400" aria-hidden="true">
+          <circle class="dial-disc" r="198" />
+          <circle class="dial-ticks" r="186" />
+          <!-- One segment per unlock step; main.js fills #dial-progress as the visitor advances -->
+          <circle class="dial-track" r="152" pathLength="80" stroke-dasharray="9 1" transform="rotate(-90)" />
+          <circle id="dial-progress" class="dial-progress" r="152" pathLength="80" stroke-dasharray="0 80" transform="rotate(-90)" />
+          <circle class="dial-core" r="118" />
+          <path id="dial-arc" d="M-94 0A94 94 0 0 0 94 0" fill="none" />
+          <text class="dial-label"><textPath href="#dial-arc" startOffset="50%" text-anchor="middle">COMPUTER SCIENCE · NUS</textPath></text>
+          <!-- Paper plane: turns to face the pointer, loops when clicked or when a step unlocks -->
+          <g id="plane" class="plane">
+            <g class="plane-body">
+              <path d="M10-58 62 62 22 48 12 72 2 48-42 62z" fill="rgb(3 14 70 / 0.35)" />
+              <path d="M0-70-52 52-10 36z" fill="#fff" />
+              <path d="M0-70 52 52 10 36z" fill="#d6e4ff" />
+              <path d="M0-70-10 36 0 60z" fill="#f8961e" />
+              <path d="M0-70 10 36 0 60z" fill="#ffd23f" />
+            </g>
+          </g>
+        </svg>
+        <a class="hero-down" href="#about" aria-label="Scroll to About">
+          <svg class="h-3 w-3" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M1 3h10L6 11z" /></svg>
+        </a>
+      </div>
+
+      <div class="hero-aside hero-aside--left">
+        <p class="hero-sub">Computer Science Undergraduate at the National University of Singapore.</p>
+        <p class="hero-intro">
+          I build web applications, then look for the ways they break. My focus is software
+          engineering, web application vulnerabilities and penetration testing.
+        </p>
+      </div>
+
+      <div class="hero-aside hero-aside--right">
+        <p class="js-only">
+          This page is a shell session. Run each command below to print its section, or
+          <button type="button" class="link" data-run="skip">show everything</button>.
+        </p>
+        <div class="hero-actions">
+          <a class="btn-primary" href="https://github.com/jvally" target="_blank" rel="noopener noreferrer">View GitHub</a>
+          <a class="btn-ghost" href="#contact">Contact Me</a>
         </div>
       </div>
     </section>
 
-    <!-- ==================== ABOUT ==================== -->
-    <section id="about" class="section">
-      <div class="container-page section-grid">
-        <h2 class="section-cmd"><span aria-hidden="true">cat about.md</span><span class="sr-only">About</span></h2>
-        <div class="section-body" data-unlock="cat about.md">
-          <div class="grid gap-10 sm:grid-cols-2">
-            <div>
-              <h3 class="subhead">Environment</h3>
-              <dl class="kv">
-                <div><dt>os</dt><dd>macOS</dd></div>
-                <div><dt>editors</dt><dd>VS Code, IntelliJ</dd></div>
-                <div><dt>vms</dt><dd>Lima</dd></div>
-                <div><dt>vcs</dt><dd>Git</dd></div>
-              </dl>
-            </div>
-            <div>
-              <h3 class="subhead">Off screen</h3>
-              <p class="max-w-sm text-sm">
-                Away from the screen I make things by hand: cardboard crafting and paper modeling.
-              </p>
-            </div>
+    <section id="about" class="panel section reveal">
+      <h2 class="cmd"><span aria-hidden="true">cat about.md</span><span class="sr-only">About</span></h2>
+      <div class="body" data-unlock="cat about.md">
+        <div class="grid gap-8 sm:grid-cols-2">
+          <div>
+            <h3 class="subhead">Environment</h3>
+            <dl class="kv">
+              <div><dt>os</dt><dd>macOS</dd></div>
+              <div><dt>editors</dt><dd>VS Code, IntelliJ</dd></div>
+              <div><dt>vms</dt><dd>Lima</dd></div>
+              <div><dt>vcs</dt><dd>Git</dd></div>
+            </dl>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==================== PROJECTS ==================== -->
-    <!--
-      To link a card to its repository, add this line before the card's <p class="card-stack">:
-      <a class="card-link" href="https://github.com/jvally/REPO" target="_blank" rel="noopener noreferrer">repo ↗</a>
-    -->
-    <section id="projects" class="section">
-      <div class="container-page section-grid">
-        <h2 class="section-cmd"><span aria-hidden="true">ls projects/</span><span class="sr-only">Projects</span></h2>
-        <div class="section-body" data-unlock="ls projects/">
-
-          <!-- 1 column on mobile, 2 columns from sm: up. The first card is featured and spans both. -->
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <article class="card card-hover sm:col-span-2">
-              <header class="card-head">
-                <h3 class="card-title">Paranoid Planner</h3>
-                <p class="card-date">Jul 2026 – Present</p>
-              </header>
-              <p class="card-body">
-                A web-based study planner for NUS students that imports timetables from NUSMods
-                and rewards finished work with gamified productivity points.
-              </p>
-              <ul class="card-list">
-                <li>Hardened JWT authentication: 15-minute access tokens, rotating server-revocable refresh tokens in httpOnly cookies, reuse detection, login rate limiting, and constant-time credential checks.</li>
-                <li>Built a productivity points system that scores task completion by priority, workload, early completion, and daily streaks, recording each award in a PostgreSQL event log with transactional reversals and unit-tested scoring logic.</li>
-                <li>Developed a NUSMods timetable import that validates a user's share link and fetches module details from the NUSMods API, replacing manual module entry.</li>
-              </ul>
-              <!-- TODO: add repo link (no public repository found on github.com/jvally) -->
-              <p class="card-stack">React · Node.js/Express · PostgreSQL · JWT Authentication · NUSMods API</p>
-            </article>
-
-            <article class="card card-hover" data-unlock="flag{bl4ck_b0x_l0gin}">
-              <header class="card-head">
-                <h3 class="card-title">Login Flow Analysis: OWASP Juice Shop</h3>
-                <p class="card-date">Oct 2026 – Present</p>
-              </header>
-              <ul class="card-list">
-                <li>Black-box tested the login flow of Juice Shop's minified Angular frontend, using Chrome DevTools and Burp Suite to map the requests, tokens, and cookies exchanged with the server.</li>
-                <li>Reproduced the authenticated workflow as a Python <code class="font-mono text-text">requests.Session</code> script and published a write-up with findings, limitations, and reproducible test cases.</li>
-              </ul>
-              <!-- TODO: add link to the write-up (no public repository found on github.com/jvally) -->
-              <p class="card-stack">JavaScript · Python · Chrome DevTools · Burp Suite</p>
-            </article>
-
-            <article class="card card-hover" data-unlock="flag{l34st_pr1v1lege}">
-              <header class="card-head">
-                <h3 class="card-title">TripShield</h3>
-                <p class="card-date">Aug 2026</p>
-              </header>
-              <p class="card-body">Built for the AMEX AI Hackathon 2026.</p>
-              <ul class="card-list">
-                <li>Enforced least-privilege access for six AI agents using request-scoped, read-only MCP tools and server-side validation, with every action auditable.</li>
-                <li>Developed a travel recovery orchestrator that propagates flight cancellations through a dependency graph, with transactional execution and rollback compensation.</li>
-              </ul>
-              <!-- TODO: add repo link (no public repository found on github.com/jvally) -->
-              <p class="card-stack">React · Vite · FastAPI · Python · MCP · REST APIs</p>
-            </article>
-
-            <article class="card card-hover" data-unlock="flag{un10n_s3lect}">
-              <header class="card-head">
-                <h3 class="card-title">Capture The Flag Competitions</h3>
-              </header>
-              <p class="card-body">
-                Competed in the CSA Cyber Conquest CTF 2026 qualifiers and practise on TryHackMe,
-                mostly on web security challenges: local file inclusion, SQL injection and cryptanalysis.
-              </p>
-              <a class="card-link" href="https://github.com/jvally/thmWriteUps" target="_blank" rel="noopener noreferrer">TryHackMe write-ups ↗</a>
-              <p class="card-stack">Web security · LFI · SQL injection · Cryptanalysis</p>
-            </article>
-
-            <article class="card card-hover" data-unlock="flag{200_0K}">
-              <header class="card-head">
-                <h3 class="card-title">Custom HTTP Web Server</h3>
-              </header>
-              <p class="card-body">
-                An HTTP server written in Python directly on top of raw TCP sockets.
-              </p>
-              <!-- TODO: add repo link (no public repository found on github.com/jvally) -->
-              <p class="card-stack">Python · TCP sockets · HTTP</p>
-            </article>
+          <div>
+            <h3 class="subhead">Off screen</h3>
+            <p class="max-w-sm text-sm">Away from the screen I make things by hand: cardboard crafting and paper modeling.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ==================== EXPERIENCE ==================== -->
-    <section id="experience" class="section">
-      <div class="container-page section-grid">
-        <h2 class="section-cmd"><span aria-hidden="true">cat experience.log</span><span class="sr-only">Experience and education</span></h2>
-        <div class="section-body" data-unlock="cat experience.log">
-          <ol class="entries">
-            <li>
-              <header class="card-head">
-                <h3 class="card-title">Bachelor of Computing in Computer Science</h3>
-                <p class="card-date">Expected May 2029</p>
-              </header>
-              <p class="entry-org">National University of Singapore</p>
-              <p class="card-body max-w-2xl text-muted">
-                Relevant coursework: CS2040S Data Structures &amp; Algorithms, CS2100 Computer Organisation,
-                CS2105 Introduction to Computer Networks.
-              </p>
-            </li>
+    <!-- To link a card to its repo, add before its .card-stack:
+         <a class="card-link" href="https://github.com/jvally/REPO" target="_blank" rel="noopener noreferrer">repo ↗</a> -->
+    <section id="projects" class="panel section reveal">
+      <h2 class="cmd"><span aria-hidden="true">ls projects/</span><span class="sr-only">Projects</span></h2>
+      <div class="body" data-unlock="ls projects/">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <article class="card card-hover sm:col-span-2">
+            <header class="card-head">
+              <h3 class="card-title">Paranoid Planner</h3>
+              <p class="card-date">Jul 2026 – Present</p>
+            </header>
+            <p class="card-body">A web-based study planner for NUS students that imports timetables from NUSMods and rewards finished work with gamified productivity points.</p>
+            <ul class="card-list">
+              <li>Hardened JWT authentication: 15-minute access tokens, rotating server-revocable refresh tokens in httpOnly cookies, reuse detection, login rate limiting, and constant-time credential checks.</li>
+              <li>Built a productivity points system that scores task completion by priority, workload, early completion, and daily streaks, recording each award in a PostgreSQL event log with transactional reversals and unit-tested scoring logic.</li>
+              <li>Developed a NUSMods timetable import that validates a user's share link and fetches module details from the NUSMods API, replacing manual module entry.</li>
+            </ul>
+            <p class="card-stack">React · Node.js/Express · PostgreSQL · JWT Authentication · NUSMods API</p>
+          </article>
 
-            <li>
-              <header class="card-head">
-                <h3 class="card-title">Intelligence Sergeant</h3>
-                <p class="card-date">Jan 2023 – Nov 2024</p>
-              </header>
-              <p class="entry-org">Singapore Armed Forces · Singapore</p>
-              <ul class="card-list max-w-2xl">
-                <li>Analysed information and produced time-sensitive intelligence reports under strict deadlines; documented findings clearly for decision-makers.</li>
-                <li>Coordinated concurrent taskings with structured documentation workflows, delivering accurate reports to stakeholders.</li>
-              </ul>
-            </li>
-          </ol>
+          <article class="card card-hover" data-unlock="flag{bl4ck_b0x_l0gin}">
+            <header class="card-head">
+              <h3 class="card-title">Login Flow Analysis: OWASP Juice Shop</h3>
+              <p class="card-date">Oct 2026 – Present</p>
+            </header>
+            <ul class="card-list">
+              <li>Black-box tested the login flow of Juice Shop's minified Angular frontend, using Chrome DevTools and Burp Suite to map the requests, tokens, and cookies exchanged with the server.</li>
+              <li>Reproduced the authenticated workflow as a Python <code class="font-mono text-text">requests.Session</code> script and published a write-up with findings, limitations, and reproducible test cases.</li>
+            </ul>
+            <p class="card-stack">JavaScript · Python · Chrome DevTools · Burp Suite</p>
+          </article>
+
+          <article class="card card-hover" data-unlock="flag{l34st_pr1v1lege}">
+            <header class="card-head">
+              <h3 class="card-title">TripShield</h3>
+              <p class="card-date">Aug 2026</p>
+            </header>
+            <p class="card-body">Built for the AMEX AI Hackathon 2026.</p>
+            <ul class="card-list">
+              <li>Enforced least-privilege access for six AI agents using request-scoped, read-only MCP tools and server-side validation, with every action auditable.</li>
+              <li>Developed a travel recovery orchestrator that propagates flight cancellations through a dependency graph, with transactional execution and rollback compensation.</li>
+            </ul>
+            <p class="card-stack">React · Vite · FastAPI · Python · MCP · REST APIs</p>
+          </article>
+
+          <article class="card card-hover" data-unlock="flag{un10n_s3lect}">
+            <h3 class="card-title">Capture The Flag Competitions</h3>
+            <p class="card-body">Competed in the CSA Cyber Conquest CTF 2026 qualifiers and practise on TryHackMe, mostly on web security challenges: local file inclusion, SQL injection and cryptanalysis.</p>
+            <a class="card-link" href="https://github.com/jvally/thmWriteUps" target="_blank" rel="noopener noreferrer">TryHackMe write-ups ↗</a>
+            <p class="card-stack">Web security · LFI · SQL injection · Cryptanalysis</p>
+          </article>
+
+          <article class="card card-hover" data-unlock="flag{200_0K}">
+            <h3 class="card-title">Custom HTTP Web Server</h3>
+            <p class="card-body">An HTTP server written in Python directly on top of raw TCP sockets.</p>
+            <p class="card-stack">Python · TCP sockets · HTTP</p>
+          </article>
         </div>
       </div>
     </section>
 
-    <!-- ==================== CONTACT ==================== -->
-    <section id="contact" class="section">
-      <div class="container-page section-grid">
-        <h2 class="section-cmd"><span aria-hidden="true">./contact.sh</span><span class="sr-only">Contact</span></h2>
-        <div class="section-body" data-unlock="./contact.sh">
-          <a class="contact-email" href="mailto:jvallyb@gmail.com">jvallyb@gmail.com</a>
-          <p class="mt-5 text-sm text-muted">
-            Also on
-            <a class="link" href="https://www.linkedin.com/in/vishesh-jally-452118341/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-            and
-            <a class="link" href="https://github.com/jvally" target="_blank" rel="noopener noreferrer">GitHub</a>.
-          </p>
-        </div>
+    <section id="experience" class="panel section reveal">
+      <h2 class="cmd"><span aria-hidden="true">cat experience.log</span><span class="sr-only">Experience and education</span></h2>
+      <div class="body" data-unlock="cat experience.log">
+        <ol class="entries">
+          <li>
+            <header class="card-head">
+              <h3 class="card-title">Bachelor of Computing in Computer Science</h3>
+              <p class="card-date">Expected May 2029</p>
+            </header>
+            <p class="entry-org">National University of Singapore</p>
+            <p class="card-body max-w-2xl text-muted">Relevant coursework: CS2040S Data Structures &amp; Algorithms, CS2100 Computer Organisation, CS2105 Introduction to Computer Networks.</p>
+          </li>
+          <li>
+            <header class="card-head">
+              <h3 class="card-title">Intelligence Sergeant</h3>
+              <p class="card-date">Jan 2023 – Nov 2024</p>
+            </header>
+            <p class="entry-org">Singapore Armed Forces · Singapore</p>
+            <ul class="card-list max-w-2xl">
+              <li>Analysed information and produced time-sensitive intelligence reports under strict deadlines; documented findings clearly for decision-makers.</li>
+              <li>Coordinated concurrent taskings with structured documentation workflows, delivering accurate reports to stakeholders.</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="contact" class="panel section reveal">
+      <h2 class="cmd"><span aria-hidden="true">./contact.sh</span><span class="sr-only">Contact</span></h2>
+      <div class="body" data-unlock="./contact.sh">
+        <a class="contact-email" href="mailto:jvallyb@gmail.com">jvallyb@gmail.com</a>
+        <p class="mt-5 text-sm text-muted">
+          Also on
+          <a class="link" href="https://www.linkedin.com/in/vishesh-jally-452118341/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+          and
+          <a class="link" href="https://github.com/jvally" target="_blank" rel="noopener noreferrer">GitHub</a>.
+        </p>
       </div>
     </section>
   </main>
 
-  <!-- ==================== FOOTER ==================== -->
-  <footer class="mt-10 border-t border-border/70 py-8">
-    <div class="container-page flex flex-col items-center justify-between gap-4 sm:flex-row">
-      <p class="font-mono text-xs text-muted">&copy; <span id="year">2026</span> Vishesh Jally</p>
-      <div class="flex gap-6">
-        <a class="nav-link" href="https://github.com/jvally" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a class="nav-link" href="https://www.linkedin.com/in/vishesh-jally-452118341/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-      </div>
-    </div>
+  <footer class="footer">
+    <p>&copy; <span id="year">2026</span> Vishesh Jally</p>
+    <p class="flex gap-6">
+      <a class="link" href="https://github.com/jvally" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a class="link" href="https://www.linkedin.com/in/vishesh-jally-452118341/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </p>
   </footer>
 
-  <!-- ==================== TERMINAL (unlock game) ==================== -->
-  <!-- Hidden unless JavaScript is running; see "Game" in src/input.css and assets/js/main.js -->
-  <aside class="terminal-dock" aria-label="Terminal mini-game">
-    <div class="container-page py-2">
+  <!-- Clouds in front of the content, at the screen edges (wide screens only) -->
+  <div class="sky sky--front" aria-hidden="true">
+    <img class="cloud cloud--5" src="assets/img/cloud-1.webp" alt="" />
+    <img class="cloud cloud--6" src="assets/img/cloud-2.webp" alt="" />
+  </div>
+
+  <!-- Terminal bar for the unlock game; shown only when JavaScript is running -->
+  <aside class="terminal" aria-label="Terminal mini-game">
+    <div class="terminal-inner">
       <div class="flex items-start gap-3">
         <p id="term-output" class="term-output" role="log" aria-live="polite"></p>
-        <span id="term-progress" class="term-progress" aria-label="Unlock progress"></span>
-        <button type="button" class="term-btn" data-game="skip" data-run="sudo unlock --all">skip</button>
-        <button type="button" class="term-btn" data-game="replay" data-run="reset">replay</button>
+        <span id="term-progress" class="shrink-0 py-1 text-muted" aria-label="Unlock progress"></span>
+        <button type="button" class="term-btn" data-run="skip">skip</button>
+        <button type="button" class="term-btn" data-run="reset">replay</button>
       </div>
-      <div class="term-input-row">
-        <label for="term-input" class="term-prompt"><span class="hidden sm:inline">visitor@vishesh:~</span>$<span class="sr-only"> Terminal command</span></label>
+      <div class="term-row mt-2 flex items-center gap-2">
+        <label for="term-input" class="shrink-0 text-accent"><span class="hidden sm:inline">visitor@vishesh:~</span>$<span class="sr-only"> Terminal command</span></label>
         <input id="term-input" class="term-input" type="text" maxlength="80" placeholder="type a command, or help"
                autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" />
-        <button type="button" id="term-run" class="term-btn term-btn--primary">run</button>
+        <button type="button" id="term-run" class="term-btn">run</button>
       </div>
     </div>
   </aside>
